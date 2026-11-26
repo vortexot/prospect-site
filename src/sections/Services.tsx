@@ -44,7 +44,7 @@ export function Services() {
       {t.services.items.map((it, i) => (
         <article className={`svc-row svc-row--${i}`} key={i}>
           <figure className="svc-plate" aria-hidden="true">
-            <img src={IMAGES[i]} alt="" loading="lazy" decoding="async" />
+            <img src={IMAGES[i]} alt="" loading="lazy" decoding="async" data-liquid="" />
             <span className="svc-shutter" />
           </figure>
           <h3 className="svc-title">

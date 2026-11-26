@@ -10,6 +10,7 @@ import { finePointer, lowPower, reducedMotion } from './core/env'
 import { S } from './core/sceneState'
 import { initScroll, lockScroll, scrollToSection } from './core/scroll'
 import { LangProvider, useI18n } from './i18n'
+import { initLiquid } from './liquid'
 import { About } from './sections/About'
 import { Finale, Footer } from './sections/Finale'
 import { Hero } from './sections/Hero'
@@ -39,6 +40,12 @@ function Site() {
     initScroll()
     lockScroll(true)
     if (reducedMotion) S.assemble = 1
+  }, [])
+
+  // liquid distortion on images, following the cursor (or a moving finger)
+  useEffect(() => {
+    if (reducedMotion || !glSupported) return
+    return initLiquid()
   }, [])
 
   // the WebGL universe lives behind the whole page. Layout effect: it starts before

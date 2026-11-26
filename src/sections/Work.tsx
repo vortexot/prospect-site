@@ -104,7 +104,7 @@ export function Work() {
                   ['--mw' as string]: p.mw,
                 }}
               >
-                <img src={`/work/${p.img}.webp`} alt={t.work.alt[i]} loading="lazy" decoding="async" draggable={false} />
+                <img src={`/work/${p.img}.webp`} alt={t.work.alt[i]} loading="lazy" decoding="async" draggable={false} data-liquid="" />
               </a>
             ))}
           </div>

@@ -26,6 +26,7 @@ function Img({ n, sizes = '1000px', eager = false, className }: { n: string; siz
       loading={eager ? 'eager' : 'lazy'}
       decoding="async"
       draggable={false}
+      data-liquid=""
     />
   )
 }

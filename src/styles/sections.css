@@ -575,6 +575,16 @@
   }
 }
 
+/* the liquid-hover canvas lies exactly over its image (geometry is set from JS) */
+canvas.liquid {
+  position: absolute;
+  display: block;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  pointer-events: none;
+}
+
 /* ================= ABOUT ================= */
 .ab {
   position: relative;
@@ -682,6 +692,7 @@
   background: var(--bg);
   transform: scaleY(0);
   transform-origin: 50% 0%;
+  pointer-events: none;
 }
 
 .svc-desc {
@@ -941,6 +952,16 @@
     position: absolute;
     inset: 0;
     transform-style: preserve-3d;
+  }
+  /* only the screenshots are hit-testable: the flat 3D wrappers would otherwise
+     swallow the pointer for any plane sitting behind them */
+  .work-stage,
+  .work-tilt,
+  .work-space {
+    pointer-events: none;
+  }
+  .work-plane {
+    pointer-events: auto;
   }
   .work-space {
     display: block;
