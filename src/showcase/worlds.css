@@ -1,0 +1,880 @@
+/* Eight concept artboards, each 1440×900 px. Pixel units on purpose:
+   the whole artboard is scaled as one image inside the showcase frame. */
+
+.world {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  font-family: var(--font);
+  color: #fff;
+  background: #000;
+  line-height: 1.4;
+  user-select: none;
+}
+
+.world img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.w-nav {
+  position: absolute;
+  z-index: 5;
+  top: 34px;
+  left: 56px;
+  right: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+}
+
+.w-nav nav {
+  display: flex;
+  gap: 38px;
+}
+
+.r1 {
+  opacity: var(--r1, 1);
+  transform: translateY(calc((1 - var(--r1, 1)) * 70px));
+}
+.r2 {
+  opacity: var(--r2, 1);
+  transform: translateY(calc((1 - var(--r2, 1)) * 44px));
+}
+.r3 {
+  opacity: var(--r3, 1);
+  transform: translateY(calc((1 - var(--r3, 1)) * 30px));
+}
+
+/* ---------- 01 construction / architecture ---------- */
+.w-arch {
+  background: #d9d9d9;
+}
+.wa-bg {
+  position: absolute;
+  inset: 0;
+}
+.wa-grid {
+  position: absolute;
+  inset: 0 56px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  mix-blend-mode: difference;
+  pointer-events: none;
+}
+.wa-grid i {
+  border-left: 1px solid rgba(255, 255, 255, 0.13);
+}
+.wa-grid i:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.13);
+}
+.wa-logo {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-size: 30px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+.wa-logo small {
+  margin-top: 4px;
+  font-family: var(--font);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.wa-quote {
+  padding: 12px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.wa-title {
+  position: absolute;
+  left: 56px;
+  bottom: 52px;
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-size: 168px;
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: #0b0b0b;
+}
+.wa-side {
+  position: absolute;
+  right: 56px;
+  bottom: 60px;
+  width: 340px;
+  color: #111;
+  font-size: 17px;
+  line-height: 1.5;
+}
+.wa-btn {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 16px 28px;
+  background: #0b0b0b;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.wa-spec {
+  position: absolute;
+  right: 56px;
+  top: 150px;
+  width: 300px;
+  padding: 22px 24px;
+  background: rgba(8, 8, 8, 0.86);
+  font-size: 13px;
+}
+.wa-spec div {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+}
+.wa-spec div:last-child {
+  border: 0;
+}
+.wa-spec dt {
+  color: #8d8d8d;
+}
+
+/* ---------- 02 real estate ---------- */
+.w-estate {
+  background: #f2f2f2;
+  color: #0b0b0b;
+}
+.we-media {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 610px;
+}
+.we-panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 610px;
+  padding: 0 56px;
+}
+.we-panel .w-nav {
+  right: auto;
+  width: 498px;
+  color: #0b0b0b;
+}
+.we-logo {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Italiana', serif;
+  font-size: 30px;
+  font-weight: 400;
+  line-height: 1;
+}
+.we-logo small {
+  margin-top: 6px;
+  font-family: var(--font);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+.we-title {
+  margin-top: 210px;
+  font-family: 'Italiana', serif;
+  font-size: 108px;
+  line-height: 0.98;
+  letter-spacing: -0.01em;
+}
+.we-sub {
+  width: 400px;
+  margin-top: 32px;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #4a4a4a;
+}
+.we-card {
+  position: absolute;
+  top: 118px;
+  right: 56px;
+  width: 290px;
+  background: rgba(8, 8, 8, 0.88);
+  color: #fff;
+}
+.we-card img {
+  height: 170px;
+}
+.we-card div {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 18px 18px;
+  font-size: 13px;
+  color: #bdbdbd;
+}
+.we-card small {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #8d8d8d;
+}
+.we-card b {
+  margin: 6px 0 2px;
+  font-family: 'Italiana', serif;
+  font-size: 26px;
+  font-weight: 400;
+  color: #fff;
+}
+.we-search {
+  position: absolute;
+  left: 56px;
+  bottom: 56px;
+  width: 1010px;
+  height: 92px;
+  display: grid;
+  grid-template-columns: 1.3fr 0.8fr 1fr auto;
+  background: #0b0b0b;
+  color: #fff;
+}
+.we-search div {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 28px;
+  border-right: 1px solid rgba(255, 255, 255, 0.14);
+  font-size: 16px;
+}
+.we-search small {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #8d8d8d;
+}
+.we-go {
+  display: grid;
+  place-items: center;
+  padding: 0 38px;
+  background: #fff;
+  color: #0b0b0b;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---------- 03 barbershop ---------- */
+.w-barber {
+  background: #0a0a0a;
+}
+.wb-img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 920px;
+  height: 900px;
+  object-position: 40% 30%;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 38%);
+  mask-image: linear-gradient(to right, transparent 0, #000 38%);
+}
+.wb-logo {
+  font-family: 'Anton', sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+}
+.wb-book {
+  padding: 12px 22px;
+  background: #fff;
+  color: #0a0a0a;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.wb-title {
+  position: absolute;
+  left: 52px;
+  top: 150px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Anton', sans-serif;
+  font-size: 232px;
+  line-height: 0.88;
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+}
+.wb-sub {
+  position: absolute;
+  left: 60px;
+  top: 600px;
+  font-family: 'Instrument Serif', serif;
+  font-style: italic;
+  font-size: 64px;
+  color: #d9d9d9;
+}
+.wb-agenda {
+  position: absolute;
+  right: 56px;
+  bottom: 56px;
+  width: 400px;
+  padding: 24px;
+  background: #f2f2f2;
+  color: #0a0a0a;
+}
+.wb-agenda small {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: #666;
+}
+.wb-slots {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  margin: 14px 0 16px;
+}
+.wb-slots span {
+  padding: 10px 0;
+  border: 1px solid #c9c9c9;
+  text-align: center;
+  font-size: 15px;
+}
+.wb-slots .on {
+  background: #0a0a0a;
+  border-color: #0a0a0a;
+  color: #fff;
+}
+.wb-cta {
+  display: block;
+  padding: 16px;
+  background: #0a0a0a;
+  color: #fff;
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.wb-meta {
+  position: absolute;
+  left: 60px;
+  bottom: 60px;
+  font-size: 14px;
+  letter-spacing: 0.08em;
+  color: #8d8d8d;
+}
+
+/* ---------- 04 restaurant ---------- */
+.w-food {
+  background: radial-gradient(circle at 50% 52%, #1b1b1b 0, #050505 52%);
+}
+.w-food .w-nav {
+  justify-content: center;
+  gap: 54px;
+  font-size: 13px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #bdbdbd;
+}
+.wf-logo {
+  margin: 0 30px;
+  font-family: 'Bodoni Moda', serif;
+  font-style: italic;
+  font-size: 40px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #fff;
+}
+.wf-res {
+  position: absolute;
+  right: 0;
+  padding: 11px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.wf-plate {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 560px;
+  height: 560px;
+  margin: -255px 0 0 -280px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 60px 140px rgba(0, 0, 0, 0.8);
+}
+.wf-plate img {
+  transform: scale(1.32);
+}
+.wf-t1,
+.wf-t2 {
+  position: absolute;
+  font-family: 'Bodoni Moda', serif;
+  font-size: 118px;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  mix-blend-mode: difference;
+}
+.wf-t1 {
+  left: 64px;
+  top: 150px;
+}
+.wf-t2 {
+  right: 64px;
+  bottom: 190px;
+  text-align: right;
+}
+.wf-menu {
+  position: absolute;
+  left: 64px;
+  bottom: 64px;
+  width: 330px;
+  font-size: 14px;
+  color: #a9a9a9;
+}
+.wf-menu small,
+.wf-book span:not(.wf-cta) {
+  font-size: 10px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.wf-menu ol {
+  margin: 12px 0;
+  color: #fff;
+  font-family: 'Bodoni Moda', serif;
+  font-size: 17px;
+}
+.wf-menu li {
+  padding: 8px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+}
+.wf-book {
+  position: absolute;
+  right: 64px;
+  bottom: 64px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.wf-book span:not(.wf-cta) {
+  padding: 15px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+}
+.wf-cta {
+  padding: 16px 28px;
+  background: #fff;
+  color: #050505;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+/* ---------- 05 clinic / aesthetics ---------- */
+.w-clinic {
+  background: #ececec;
+  color: #141414;
+}
+.wc-logo {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Tenor Sans', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.04em;
+}
+.wc-logo small {
+  margin-top: 6px;
+  font-family: var(--font);
+  font-size: 10px;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: #6a6a6a;
+}
+.wc-s {
+  padding: 12px 24px;
+  border-radius: 40px;
+  border: 1px solid #141414;
+  font-size: 13px;
+}
+.wc-title {
+  position: absolute;
+  left: 56px;
+  top: 196px;
+  width: 700px;
+  font-family: 'Tenor Sans', sans-serif;
+  font-size: 78px;
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+}
+.wc-sub {
+  position: absolute;
+  left: 56px;
+  top: 460px;
+  width: 440px;
+  font-size: 18px;
+  line-height: 1.6;
+  color: #555;
+}
+.wc-form {
+  position: absolute;
+  left: 56px;
+  bottom: 80px;
+  width: 700px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 8px;
+}
+.wc-form div {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 22px;
+  border-radius: 46px;
+  background: #fff;
+  font-size: 16px;
+}
+.wc-form small {
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #888;
+}
+.wc-go {
+  display: grid;
+  place-items: center;
+  padding: 0 30px;
+  border-radius: 46px;
+  background: #141414;
+  color: #fff;
+  font-size: 14px;
+}
+.wc-arch {
+  position: absolute;
+  right: 300px;
+  top: 112px;
+  width: 400px;
+  height: 708px;
+  border-radius: 200px 200px 0 0;
+  overflow: hidden;
+}
+.wc-arch img {
+  object-position: 62% 50%;
+}
+.wc-thumb {
+  position: absolute;
+  right: 56px;
+  bottom: 80px;
+  width: 210px;
+  height: 270px;
+  border-radius: 110px 110px 0 0;
+  overflow: hidden;
+}
+.wc-list {
+  position: absolute;
+  right: 56px;
+  top: 140px;
+  font-family: 'Tenor Sans', sans-serif;
+  font-size: 22px;
+  line-height: 1.6;
+  text-align: right;
+  color: #6a6a6a;
+}
+
+/* ---------- 06 fitness ---------- */
+.w-fit {
+  background: #050505;
+}
+.wfi-img {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1000px;
+  clip-path: polygon(24% 0, 100% 0, 100% 100%, 0 100%);
+}
+.wfi-img img {
+  filter: contrast(1.15) brightness(0.9);
+}
+.wfi-logo {
+  font-size: 28px;
+  font-weight: 900;
+  font-stretch: 62%;
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+.wfi-s {
+  padding: 12px 22px;
+  background: #fff;
+  color: #050505;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.wfi-title {
+  position: absolute;
+  left: 50px;
+  top: 128px;
+  display: flex;
+  flex-direction: column;
+  font-size: 214px;
+  font-weight: 900;
+  font-stretch: 62%;
+  line-height: 0.8;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  mix-blend-mode: difference;
+}
+.wfi-title span {
+  transform: skewX(-9deg);
+}
+.wfi-title span:nth-child(2) {
+  padding-left: 120px;
+}
+.wfi-sub {
+  position: absolute;
+  left: 56px;
+  bottom: 160px;
+  width: 400px;
+  font-size: 17px;
+  line-height: 1.55;
+  color: #bdbdbd;
+}
+.wfi-sched {
+  position: absolute;
+  right: 56px;
+  bottom: 56px;
+  display: flex;
+  align-items: stretch;
+  background: #fff;
+  color: #050505;
+}
+.wfi-sched small {
+  display: grid;
+  place-items: center;
+  padding: 0 22px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  border-left: 1px solid #ddd;
+}
+.wfi-sched div {
+  display: flex;
+  flex-direction: column;
+  padding: 16px 26px;
+  border-right: 1px solid #ddd;
+  font-size: 14px;
+}
+.wfi-sched b {
+  font-size: 26px;
+  font-weight: 800;
+  font-stretch: 75%;
+}
+.wfi-cta {
+  display: grid;
+  place-items: center;
+  padding: 0 28px;
+  background: #050505;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.wfi-small {
+  position: absolute;
+  left: 56px;
+  bottom: 56px;
+  width: 0;
+  height: 0;
+}
+
+/* ---------- 07 automotive ---------- */
+.w-auto {
+  background: radial-gradient(ellipse at 50% 70%, #202020 0, #070707 55%, #000 100%);
+}
+.wau-logo {
+  font-family: 'Michroma', sans-serif;
+  font-size: 22px;
+  font-weight: 400;
+  letter-spacing: 0.32em;
+}
+.w-auto .w-nav nav {
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #a9a9a9;
+}
+.wau-s {
+  padding: 11px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.wau-title {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 130px;
+  font-family: 'Michroma', sans-serif;
+  font-size: 54px;
+  line-height: 1.22;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+}
+.wau-car {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 290px;
+  height: 520px;
+}
+.wau-car img {
+  object-position: 50% 62%;
+}
+.wau-specs {
+  position: absolute;
+  left: 56px;
+  bottom: 64px;
+  display: flex;
+  gap: 64px;
+}
+.wau-specs div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 18px;
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
+}
+.wau-specs b {
+  font-family: 'Michroma', sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+.wau-specs span {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #8d8d8d;
+}
+.wau-foot {
+  position: absolute;
+  right: 56px;
+  bottom: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 14px;
+}
+.wau-model {
+  font-family: 'Michroma', sans-serif;
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  color: #a9a9a9;
+}
+.wau-cta {
+  padding: 18px 30px;
+  background: #fff;
+  color: #000;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* ---------- 08 fashion / e-commerce ---------- */
+.w-fashion {
+  background: #efefef;
+  color: #0b0b0b;
+}
+.wfa-logo {
+  font-family: 'Instrument Serif', serif;
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+}
+.wfa-main {
+  position: absolute;
+  left: 56px;
+  top: 100px;
+  bottom: 0;
+  width: 560px;
+}
+.wfa-main img {
+  object-position: 50% 30%;
+}
+.wfa-title {
+  position: absolute;
+  left: 420px;
+  top: 190px;
+  font-family: 'Instrument Serif', serif;
+  font-size: 196px;
+  font-weight: 400;
+  line-height: 0.86;
+  letter-spacing: -0.02em;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+.wfa-side {
+  position: absolute;
+  right: 56px;
+  top: 110px;
+  width: 300px;
+}
+.wfa-side img {
+  height: 360px;
+}
+.wfa-prod {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 12px;
+  font-size: 14px;
+}
+.wfa-coll {
+  position: absolute;
+  left: 680px;
+  bottom: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.wfa-coll small {
+  font-size: 10px;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: #777;
+}
+.wfa-coll span:not(.wfa-cta) {
+  font-family: 'Instrument Serif', serif;
+  font-size: 54px;
+  line-height: 1.1;
+}
+.wfa-cta {
+  margin-top: 16px;
+  padding: 16px 30px;
+  background: #0b0b0b;
+  color: #fff;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.wfa-issue {
+  position: absolute;
+  right: 56px;
+  bottom: 52px;
+  font-family: 'Instrument Serif', serif;
+  font-size: 96px;
+  line-height: 1;
+}

@@ -1,0 +1,83 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #050505;
+  color: #f2f2f2;
+  font-family: 'Archivo Variable', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.nf-main {
+  position: relative;
+  min-height: 100%;
+  display: grid;
+  place-content: center;
+  justify-items: start;
+  gap: 1rem;
+  padding: 3rem clamp(1.25rem, 6vw, 6rem);
+  overflow: hidden;
+}
+
+.nf-shards {
+  position: absolute;
+  right: -4vw;
+  top: 50%;
+  width: min(70vmin, 40rem);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+.nf-shards path {
+  fill: #151515;
+}
+
+.nf-code {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.2em;
+  color: #929292;
+}
+
+.nf-title {
+  position: relative;
+  max-width: 12em;
+  margin: 0;
+  font-size: clamp(2.4rem, 7vw, 6rem);
+  font-weight: 700;
+  font-stretch: 110%;
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+}
+
+.nf-sub {
+  position: relative;
+  margin: 0;
+  color: #929292;
+}
+
+.nf-home {
+  position: relative;
+  margin-top: 1.5rem;
+  padding: 1rem 1.6rem;
+  background: #fff;
+  color: #050505;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.nf-home span {
+  color: #6a6a6a;
+}
+
+.nf-home:hover {
+  background: #d9d9d9;
+}
+
+.nf-home:focus-visible {
+  outline: 1px solid #fff;
+  outline-offset: 4px;
+}
