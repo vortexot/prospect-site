@@ -626,14 +626,14 @@ export class Universe {
     return aspect < 1 ? 1 + (1 - aspect) * 0.95 : 1
   }
 
-  /** World position and scale that keep the tower (about 5 × 7.2 units) inside a screen box. */
+  /** World position and scale that keep the tower (about 4.6 × 7.1 units with its tilt) inside a screen box. */
   private fit(box: Box, z: number) {
     const visH = 2 * z * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))
     const visW = visH * this.camera.aspect
     return {
       x: (box.x - 0.5) * visW,
       y: 0.1 + (0.5 - box.y) * visH,
-      s: Math.max(0.2, Math.min(1, (box.w * visW) / 5, (box.h * visH) / 7.2)),
+      s: Math.max(0.2, Math.min(1.15, (box.w * visW) / 4.6, (box.h * visH) / 7.1)),
     }
   }
 

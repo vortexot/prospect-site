@@ -30,7 +30,7 @@
 
 .hero-title {
   margin-top: 1rem;
-  font-size: min(11.5vw, 6.8svh, 5.5rem);
+  font-size: min(12.6vw, 7.6svh, 5.5rem);
   font-weight: 600;
   line-height: 0.92;
   letter-spacing: -0.035em;
@@ -124,12 +124,18 @@
     padding-top: 6.4rem;
     padding-bottom: 1.75rem;
   }
+  .hero-label {
+    margin-top: auto;
+  }
   .hero-title {
-    font-size: min(6vw, 11svh);
+    font-size: min(7.6vw, 11.6svh);
   }
   .hero-side {
-    margin-bottom: 1rem;
-    max-width: min(24rem, 34vw);
+    margin-top: min(2.5rem, 4svh);
+    max-width: min(28rem, 38vw);
+  }
+  .hero-foot {
+    margin-top: auto;
   }
 }
 
@@ -445,6 +451,25 @@
   }
 }
 
+/* upright phone: a tall frame that fills the space between the title and the index */
+@media (max-width: 899px) and (orientation: portrait) and (prefers-reduced-motion: no-preference) {
+  .sc-intro {
+    display: none;
+  }
+  .sc-viewport {
+    aspect-ratio: 10 / 11;
+  }
+  .sc-stage {
+    width: 1000px;
+    height: 1100px;
+  }
+  .sc-frame {
+    --fw: min(calc(100vw - var(--gutter) * 2), calc((100svh - 22.5rem) * 0.909));
+    top: calc(50% - 2.9rem);
+    margin: calc(var(--fw) * -0.55 - 0.8rem) 0 0 calc(var(--fw) / -2);
+  }
+}
+
 /* phone on its side: exactly the desktop arrangement, index left and frame right */
 @media (max-width: 899px) and (max-height: 500px) and (prefers-reduced-motion: no-preference) {
   .sc-side {
@@ -555,7 +580,7 @@
   position: relative;
   display: grid;
   gap: 1.5rem;
-  padding: 20vh var(--gutter) 14vh;
+  padding: 12vh var(--gutter) 5vh;
 }
 
 .ab-title {
@@ -577,7 +602,7 @@
 @media (min-width: 900px) {
   .ab {
     grid-template-columns: minmax(10rem, 1fr) 3.4fr;
-    padding-top: 28vh;
+    padding-top: 16vh;
   }
   .ab-title {
     padding-top: 0.9rem;
@@ -587,13 +612,13 @@
 /* ================= SERVICES ================= */
 .svc {
   position: relative;
-  padding: 10vh 0 12vh;
+  padding: 4vh 0 3vh;
 }
 
 .svc-head {
   display: grid;
   gap: 1rem;
-  padding: 0 var(--gutter) 8vh;
+  padding: 0 var(--gutter) 4vh;
 }
 
 .svc-head h2 {
@@ -612,8 +637,8 @@
 .svc-row {
   position: relative;
   display: grid;
-  gap: 1.5rem;
-  padding: 6vh var(--gutter);
+  gap: 1.1rem;
+  padding: 4vh var(--gutter);
   border-top: 1px solid var(--line);
   overflow: hidden;
 }
@@ -673,93 +698,97 @@
   .svc-row {
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-template-rows: auto auto;
-    column-gap: 1.25rem;
-    row-gap: 7vh;
-    min-height: 74vh;
-    align-content: center;
-    padding: 9vh var(--gutter);
+    gap: 3vh 2rem;
+    padding: 6vh var(--gutter);
   }
-  /* the word owns the first row; image and text share the second, never on top of it */
+  /* image and text sit beside or below the word, never on top of it */
   .svc-title {
     grid-row: 1;
     grid-column: 1 / -1;
+    align-self: start;
   }
   .svc-plate {
     grid-row: 2;
     align-self: start;
+    aspect-ratio: 16 / 8;
   }
   .svc-desc {
     grid-row: 2;
     align-self: end;
+    font-size: var(--fs-l);
   }
   /* each service gets its own composition */
   .svc-row--0 .svc-plate {
-    grid-column: 8 / 12;
+    grid-column: 5 / 13;
   }
   .svc-row--0 .svc-desc {
-    grid-column: 2 / 6;
-    align-self: start;
+    grid-column: 1 / 5;
+  }
+  .svc-row--2 .svc-plate {
+    grid-column: 1 / 9;
+  }
+  .svc-row--2 .svc-desc {
+    grid-column: 9 / 13;
+  }
+  /* two-word services: the image fills the space beside the stacked words */
+  .svc-row--1 .svc-title,
+  .svc-row--3 .svc-title {
+    font-size: min(9.2vw, 11.4rem);
   }
   .svc-row--1 .svc-title {
+    grid-column: 7 / 13;
     align-items: flex-end;
     text-align: right;
   }
   .svc-row--1 .svc-plate {
-    grid-column: 2 / 6;
+    grid-row: 1 / span 2;
+    grid-column: 1 / 7;
+    aspect-ratio: auto;
+    align-self: stretch;
+    min-height: 56vh;
   }
   .svc-row--1 .svc-desc {
-    grid-column: 9 / 13;
+    grid-column: 8 / 13;
+    justify-self: end;
+    text-align: right;
   }
-  .svc-row--2 .svc-title {
-    padding-left: 6vw;
-  }
-  .svc-row--2 .svc-plate {
-    grid-column: 6 / 10;
-    aspect-ratio: 4 / 3;
-  }
-  .svc-row--2 .svc-desc {
-    grid-column: 1 / 5;
-    align-self: start;
-  }
-  .svc-row--3 .svc-line:nth-child(2) {
-    padding-left: 8vw;
+  .svc-row--3 .svc-title {
+    grid-column: 1 / 8;
   }
   .svc-row--3 .svc-plate {
-    grid-column: 9 / 13;
-    aspect-ratio: 3 / 4;
-    width: 66%;
-    justify-self: end;
+    grid-row: 1 / span 2;
+    grid-column: 8 / 13;
+    aspect-ratio: auto;
+    align-self: stretch;
+    min-height: 56vh;
   }
   .svc-row--3 .svc-desc {
-    grid-column: 2 / 6;
-    align-self: start;
+    grid-column: 1 / 6;
+  }
+  .svc-row--1 .svc-plate img,
+  .svc-row--3 .svc-plate img {
+    position: absolute;
+    inset: 0;
   }
 }
 
-/* phone: word, then image, then text — offset widths keep the editorial rhythm */
+/* phone: word, then a full-width image, then text */
 @media (max-width: 899px) {
   .svc-title {
     order: -1;
   }
-  .svc-row--0 .svc-plate {
-    width: 84%;
-    justify-self: end;
-  }
   .svc-row--1 .svc-title {
     align-items: flex-end;
     text-align: right;
   }
   .svc-row--1 .svc-plate {
-    width: 72%;
-    aspect-ratio: 4 / 5;
+    aspect-ratio: 1 / 1;
   }
   .svc-row--3 .svc-line:nth-child(2) {
     padding-left: 9vw;
   }
   .svc-row--3 .svc-plate {
-    width: 66%;
-    aspect-ratio: 3 / 4;
-    justify-self: end;
+    aspect-ratio: 4 / 3;
   }
 }
 
@@ -940,8 +969,9 @@
     position: absolute;
     z-index: 3;
     left: var(--gutter);
-    bottom: 2.5rem;
-    width: min(25rem, 32vw);
+    top: 50%;
+    transform: translateY(-50%);
+    width: min(26rem, 31vw);
     padding: 1.75rem;
     background: rgba(5, 5, 5, 0.82);
     outline: 1px solid var(--line);
@@ -979,7 +1009,9 @@
   }
   .work-info {
     right: var(--gutter);
+    top: auto;
     bottom: 1rem;
+    transform: none;
     width: auto;
     gap: 0.45rem;
     padding: 1.1rem 1.25rem;

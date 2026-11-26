@@ -29,10 +29,10 @@ export function Showcase() {
   const activeRef = useRef(0)
   const goRef = useRef<(k: number) => void>(() => {})
 
-  // artboard scale: 1440×900 drawn into whatever size the frame has
+  // artboard scale: the stage (1440×900, or 1000×1100 on upright phones) fills the frame
   useEffect(() => {
     const vp = viewport.current!
-    const ro = new ResizeObserver(([e]) => stage.current!.style.setProperty('--s', String(e.contentRect.width / 1440)))
+    const ro = new ResizeObserver(([e]) => stage.current!.style.setProperty('--s', String(e.contentRect.width / stage.current!.offsetWidth)))
     ro.observe(vp)
     return () => ro.disconnect()
   }, [])

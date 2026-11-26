@@ -84,7 +84,7 @@ export function Hero() {
       if (vw >= 900) {
         // desktop: the column right of the text
         const textRight = Math.max(side.right, ...[...el.querySelectorAll('.h-w')].map((w) => w.getBoundingClientRect().right))
-        S.heroBox = toBox(textRight + 32, 76, vw - 24, vh - 64)
+        S.heroBox = toBox(textRight + 32, 112, vw - 24, vh - 52)
       } else {
         // phone: the band between the headline and the supporting text
         S.heroBox = toBox(0, title.bottom - base + 4, vw, side.top - base - 4)

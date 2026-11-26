@@ -24,7 +24,7 @@ export function Process() {
       if (vw >= 900) {
         const textRight = q('.proc-inner').offsetLeft + steps.offsetLeft + steps.offsetWidth
         const trackTop = q('.proc-track').offsetTop
-        S.procBox = toBox(textRight + 32, 76, vw - 24, (trackTop || vh) - 12)
+        S.procBox = toBox(textRight + 32, 100, vw - 24, (trackTop || vh) - 34)
       } else {
         const textTop = steps.offsetTop + Math.min(...items.map((s) => s.offsetTop))
         S.procBox = toBox(0, q('.proc-title').offsetTop + q('.proc-title').offsetHeight + 4, vw, textTop - 8)

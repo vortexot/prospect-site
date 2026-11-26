@@ -1,20 +1,27 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { clamp01, finePointer, MQ, warmImages } from '../core/env'
+import { clamp01, easeInOut, finePointer, lerp, MQ, warmImages } from '../core/env'
 import { useI18n } from '../i18n'
 import { Roll } from '../components/Nav'
 
 const URL = 'https://evo-reformas.vercel.app/'
 /** screenshots of the live site placed in depth; z in px, x/y/w in viewport units (m* = phone) */
 const PLANES = [
-  { img: 'evo-1', x: 17, y: -3, z: 0, w: 44, mx: 0, my: -15, mw: 82 },
-  { img: 'evo-2', x: 20, y: 2, z: -950, w: 42, mx: 5, my: -13, mw: 76 },
-  { img: 'evo-3', x: 16, y: -1, z: -1900, w: 42, mx: -5, my: -15, mw: 76 },
-  { img: 'evo-mobile', x: 21, y: -2, z: -2750, w: 15, mx: 6, my: -13, mw: 38 },
-  { img: 'evo-4', x: 18, y: -10, z: -3600, w: 35, mx: 0, my: -4, mw: 72 },
+  { img: 'evo-1', x: 15, y: 2, z: 0, w: 'min(56vw, 96svh)', mx: 0, my: -14, mw: 'min(94vw, 62svh)' },
+  { img: 'evo-2', x: 15, y: 2, z: -950, w: 'min(56vw, 96svh)', mx: 0, my: -14, mw: 'min(94vw, 62svh)' },
+  { img: 'evo-3', x: 15, y: 2, z: -1900, w: 'min(56vw, 96svh)', mx: 0, my: -14, mw: 'min(94vw, 62svh)' },
+  { img: 'evo-mobile', x: 15, y: 1, z: -2750, w: 'min(17.5vw, 30svh)', mx: 0, my: -14, mw: 'min(52vw, 22svh)' },
+  { img: 'evo-4', x: 17, y: -10, z: -3600, w: 'min(42vw, 58svh)', mx: 0, my: -3, mw: 'min(88vw, 44svh)' },
 ]
-const TRAVEL = 3900
+
+/** Camera distance for a scroll position: it rests on each screenshot, then flies to the next. */
+function travelAt(p: number) {
+  const u = clamp01((p - 0.02) / 0.9) * (PLANES.length - 1)
+  const k = Math.min(Math.floor(u), PLANES.length - 2)
+  const f = easeInOut(clamp01((u - k - 0.25) / 0.5))
+  return lerp(-PLANES[k].z, -PLANES[k + 1].z, f)
+}
 
 export function Work() {
   const { t, wa } = useI18n()
@@ -30,12 +37,12 @@ export function Work() {
       const planes = gsap.utils.toArray<HTMLElement>('.work-plane', el)
       const next = el.querySelector<HTMLElement>('.work-next')!
       const place = (p: number) => {
-        const travel = p * TRAVEL - 250
+        const travel = travelAt(p)
         space.style.transform = `translate3d(0,0,${travel.toFixed(1)}px)`
         planes.forEach((pl, i) => {
           const z = PLANES[i].z + travel
           // one screenshot is clear at a time: the next fades up as the current one leaves
-          const o = clamp01((z + 1050) / 650) * (1 - clamp01((z - 30) / 260))
+          const o = clamp01((z + 850) / 500) * (1 - clamp01((z - 30) / 260))
           pl.style.opacity = o.toFixed(3)
           pl.style.visibility = o < 0.01 ? 'hidden' : 'visible'
         })
@@ -91,10 +98,10 @@ export function Work() {
                   ['--x' as string]: `${p.x}vw`,
                   ['--y' as string]: `${p.y}vh`,
                   ['--z' as string]: `${p.z}px`,
-                  ['--w' as string]: `${p.w}vw`,
+                  ['--w' as string]: p.w,
                   ['--mx' as string]: `${p.mx}vw`,
                   ['--my' as string]: `${p.my}svh`,
-                  ['--mw' as string]: `${p.mw}vw`,
+                  ['--mw' as string]: p.mw,
                 }}
               >
                 <img src={`/work/${p.img}.webp`} alt={t.work.alt[i]} loading="lazy" decoding="async" draggable={false} />
