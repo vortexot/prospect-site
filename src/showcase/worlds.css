@@ -878,3 +878,125 @@
   font-size: 96px;
   line-height: 1;
 }
+
+/* ================================================================
+   Legibility pass: in every concept the headline has its own area.
+   Photography sits beside the words, never underneath them.
+   ================================================================ */
+
+/* 01 architecture: paper column for text, photo to the right, dark header */
+.w-arch .w-nav {
+  color: #0b0b0b;
+}
+.w-arch .wa-quote {
+  border-color: rgba(11, 11, 11, 0.55);
+}
+.w-arch .wa-bg {
+  left: 620px;
+  top: 108px;
+  width: 820px;
+  height: 792px;
+}
+.w-arch .wa-grid {
+  left: 620px;
+  right: 0;
+  top: 108px;
+}
+.w-arch .wa-title {
+  top: 176px;
+  bottom: auto;
+  font-size: 112px;
+  line-height: 0.9;
+}
+.w-arch .wa-side {
+  left: 56px;
+  right: auto;
+  bottom: 72px;
+  width: 430px;
+}
+
+/* 02 real estate: headline stays inside its panel */
+.w-estate .we-title {
+  font-size: 82px;
+}
+
+/* 03 barbershop */
+.w-barber .wb-img {
+  width: 700px;
+}
+.w-barber .wb-title {
+  font-size: 168px;
+  mix-blend-mode: normal;
+}
+.w-barber .wb-sub {
+  top: 500px;
+}
+
+/* 04 restaurant: words left, plate right */
+.w-food {
+  background: radial-gradient(circle at 78% 48%, #1b1b1b 0, #050505 50%);
+}
+.w-food .wf-plate {
+  left: 850px;
+  top: 170px;
+  width: 520px;
+  height: 520px;
+  margin: 0;
+}
+.w-food .wf-t1,
+.w-food .wf-t2 {
+  left: 64px;
+  right: auto;
+  bottom: auto;
+  font-size: 94px;
+  text-align: left;
+  mix-blend-mode: normal;
+}
+.w-food .wf-t1 {
+  top: 200px;
+}
+.w-food .wf-t2 {
+  top: 312px;
+}
+
+/* 05 clinic */
+.w-clinic .wc-title,
+.w-clinic .wc-form {
+  width: 640px;
+}
+
+/* 06 fitness */
+.w-fit .wfi-img {
+  width: 780px;
+}
+.w-fit .wfi-title {
+  font-size: 176px;
+  mix-blend-mode: normal;
+}
+
+/* 07 automotive */
+.w-auto .wau-car {
+  height: 440px;
+}
+
+/* 08 fashion: photo, headline and product in three separate columns */
+.w-fashion .wfa-main {
+  width: 470px;
+}
+.w-fashion .wfa-title {
+  left: 566px;
+  top: 220px;
+  font-size: 112px;
+  line-height: 0.95;
+  color: #0b0b0b;
+  mix-blend-mode: normal;
+}
+.w-fashion .wfa-side {
+  width: 260px;
+}
+.w-fashion .wfa-side img {
+  height: 340px;
+}
+.w-fashion .wfa-coll {
+  left: 566px;
+}

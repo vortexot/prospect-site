@@ -103,8 +103,12 @@ export function Showcase() {
         onUpdate: (s) => {
           const p = s.progress * UNITS
           S.explode = 0.45 + 0.55 * clamp01(p)
+          S.hush = s.isActive ? clamp01(p) : 0
           intro(p)
           render(p)
+        },
+        onToggle: (s) => {
+          if (!s.isActive) S.hush = 0
         },
       })
       intro(0)
@@ -262,7 +266,7 @@ export function Showcase() {
             <span>{t.showcase.niches[active]}</span>
             <span>{label}</span>
           </div>
-          <div className="sc-viewport" ref={viewport} data-cursor={`label:${label}`}>
+          <div className="sc-viewport" ref={viewport}>
             <div className="sc-stage" ref={stage} aria-hidden="true">
               {WORLDS.map((W, i) => (
                 <div className="sc-world" key={i} ref={(d) => void (worlds.current[i] = d!)} style={i ? { visibility: 'hidden' } : undefined}>

@@ -1,30 +1,27 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { finePointer, reducedMotion } from '../core/env'
-import { S } from '../core/sceneState'
 
 /**
- * One cohesive cursor: a dot, a lagging ring that becomes a label or a lens,
- * and magnetic pull on [data-magnetic] elements. Desktop pointers only.
+ * One cohesive cursor: a dot, a lagging ring, a small label that sits beside the
+ * pointer (never on top of what it points at), and magnetic pull on [data-magnetic].
+ * Desktop pointers only.
  *
- * data-cursor values: "link" | "label:Text" | "lens:/image.webp"
+ * data-cursor values: "link" | "label:Text"
  */
 export function Cursor() {
   const dot = useRef<HTMLDivElement>(null)
   const ring = useRef<HTMLDivElement>(null)
   const label = useRef<HTMLSpanElement>(null)
-  const lens = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     if (!finePointer) return
     document.documentElement.classList.add('has-cursor')
     const d = dot.current!
     const r = ring.current!
-    const l = lens.current!
     const lab = label.current!
     const pos = { x: innerWidth / 2, y: innerHeight / 2 }
     const ringPos = { ...pos }
-    const lensPos = { ...pos }
     let mode = ''
     let visible = false
     let magnet: HTMLElement | null = null
@@ -34,23 +31,19 @@ export function Cursor() {
       if (m === mode) return
       mode = m
       r.className = 'cur-ring'
-      l.classList.remove('is-on')
       lab.textContent = ''
       if (m === 'link') r.classList.add('is-link')
       else if (m.startsWith('label:')) {
         r.classList.add('is-label')
         lab.textContent = m.slice(6)
-      } else if (m.startsWith('lens:')) {
-        r.classList.add('is-hidden')
-        l.style.backgroundImage = `url("${m.slice(5)}")`
-        l.classList.add('is-on')
       }
     }
 
     const readTarget = (under: Element | null) => {
       const target = under?.closest<HTMLElement>('[data-cursor], a, button, [role="button"], input, select, textarea')
       if (!target) setMode('')
-      else if (target.dataset.cursor) setMode(target.dataset.cursor)
+      // an empty data-cursor means "plain cursor here" (used on text blocks)
+      else if (target.dataset.cursor !== undefined) setMode(target.dataset.cursor)
       else if (/^(INPUT|SELECT|TEXTAREA)$/.test(target.tagName)) setMode('')
       else setMode('link')
     }
@@ -71,8 +64,8 @@ export function Cursor() {
       pos.y = e.clientY
       if (!visible) {
         visible = true
-        ringPos.x = lensPos.x = pos.x
-        ringPos.y = lensPos.y = pos.y
+        ringPos.x = pos.x
+        ringPos.y = pos.y
         document.documentElement.classList.add('cursor-in')
       }
       readTarget(e.target as Element | null)
@@ -84,7 +77,8 @@ export function Cursor() {
       }
       if (magnet && !reducedMotion) {
         const b = magnet.getBoundingClientRect()
-        const strength = Number(magnet.dataset.magnetic) || 0.3
+        // gentle pull: buttons must never slide over their neighbours
+        const strength = (Number(magnet.dataset.magnetic) || 0.3) * 0.45
         gsap.to(magnet, {
           x: (pos.x - (b.left + b.width / 2)) * strength,
           y: (pos.y - (b.top + b.height / 2)) * strength,
@@ -104,12 +98,8 @@ export function Cursor() {
     const tick = () => {
       ringPos.x += (pos.x - ringPos.x) * k
       ringPos.y += (pos.y - ringPos.y) * k
-      lensPos.x += (pos.x - lensPos.x) * (reducedMotion ? 1 : 0.13)
-      lensPos.y += (pos.y - lensPos.y) * (reducedMotion ? 1 : 0.13)
       d.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`
       r.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0)`
-      l.style.transform = `translate3d(${lensPos.x}px, ${lensPos.y}px, 0)`
-      r.classList.toggle('is-object', S.hovered >= 0 && mode.startsWith('label:'))
     }
     gsap.ticker.add(tick)
     window.addEventListener('pointermove', onMove, { passive: true })
@@ -131,7 +121,6 @@ export function Cursor() {
   if (!finePointer) return null
   return (
     <div className="cur" aria-hidden="true">
-      <div className="cur-lens" ref={lens} />
       <div className="cur-ring" ref={ring}>
         <span ref={label} />
       </div>

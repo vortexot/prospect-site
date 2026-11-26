@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { finePointer, isNarrow, MQ, reducedMotion } from '../core/env'
-import { S } from '../core/sceneState'
+import { S, toBox } from '../core/sceneState'
 import { scrollToSection } from '../core/scroll'
 import { useI18n } from '../i18n'
 import { Roll } from '../components/Nav'
@@ -39,13 +39,17 @@ export function Hero() {
         gsap.set(['.hero-label', '.hero-side > *', '.hero-foot'], { autoAlpha: 0, y: 22 })
       }
       const mm = gsap.matchMedia()
-      const scrollOut = (lift: number) =>
-        gsap
+      mm.add(MQ.immersive, () => {
+        const tl = gsap
           .timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom top', scrub: true } })
           .to('.hero-title', { yPercent: -38, ease: 'none' }, 0)
           .to('.hero-title', { autoAlpha: 0, ease: 'power1.in' }, 0.15)
-          .to(['.hero-side', '.hero-label', '.hero-foot'], { y: -lift, autoAlpha: 0, ease: 'none' }, 0)
-      mm.add(MQ.immersive, () => void scrollOut(isNarrow() ? 60 : 90))
+          .to('.hero-label', { y: -60, autoAlpha: 0, ease: 'none' }, 0)
+        // whatever would scroll across the 3D tower fades out before it gets there
+        tl.to('.hero-foot', { autoAlpha: 0, duration: 0.08, ease: 'none' }, 0)
+        if (isNarrow()) tl.to('.hero-side', { autoAlpha: 0, duration: 0.09, ease: 'none' }, 0)
+        else tl.to('.hero-side', { y: -90, autoAlpha: 0, ease: 'none' }, 0)
+      })
     }, el)
 
     const reveal = () =>
@@ -66,6 +70,40 @@ export function Hero() {
       ctx.revert()
     }
   }, [])
+
+  // tell the 3D scene where the empty space is, so the tower never sits behind text
+  useEffect(() => {
+    const el = root.current!
+    const measure = () => {
+      if (window.scrollY > 24) return // the title is mid scroll-out: keep the last box
+      const base = el.getBoundingClientRect().top
+      const title = el.querySelector<HTMLElement>('.hero-title')!.getBoundingClientRect()
+      const side = el.querySelector<HTMLElement>('.hero-side')!.getBoundingClientRect()
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      if (vw >= 900) {
+        // desktop: the column right of the text
+        const textRight = Math.max(side.right, ...[...el.querySelectorAll('.h-w')].map((w) => w.getBoundingClientRect().right))
+        S.heroBox = toBox(textRight + 32, 76, vw - 24, vh - 64)
+      } else {
+        // phone: the band between the headline and the supporting text
+        S.heroBox = toBox(0, title.bottom - base + 4, vw, side.top - base - 4)
+      }
+    }
+    const ro = new ResizeObserver(measure)
+    el.querySelectorAll('.hero-title, .hero-side').forEach((n) => ro.observe(n))
+    window.addEventListener('resize', measure)
+    document.fonts.ready.then(measure)
+    // the headline settles (width animation) a moment after the reveal
+    const later = [600, 2200, 4200].map((ms) => window.setTimeout(measure, ms))
+    window.addEventListener('prospect:reveal', () => later.push(window.setTimeout(measure, 2100)), { once: true })
+    measure()
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+      later.forEach(clearTimeout)
+    }
+  }, [lang])
 
   // characters lean away from the cursor (width + lift), with their own easing
   useEffect(() => {
@@ -155,8 +193,10 @@ export function Hero() {
 
   return (
     <section className="hero" id="top" ref={root} tabIndex={-1} aria-labelledby="hero-title" data-cursor={`label:${t.cursor.drag}`}>
-      <p className="hero-label">{t.hero.label}</p>
-      <h1 className="hero-title" id="hero-title">
+      <p className="hero-label" data-cursor="">
+        {t.hero.label}
+      </p>
+      <h1 className="hero-title" id="hero-title" data-cursor="">
         {t.hero.title.map((line, i) => (
           <Fragment key={i}>
             <span className="h-line">
@@ -168,7 +208,9 @@ export function Hero() {
         ))}
       </h1>
       <div className="hero-side">
-        <p className="hero-sub">{t.hero.sub}</p>
+        <p className="hero-sub" data-cursor="">
+          {t.hero.sub}
+        </p>
         <div className="hero-ctas">
           <a
             className="btn btn--solid"

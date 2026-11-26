@@ -8,11 +8,11 @@ import { Roll } from '../components/Nav'
 const URL = 'https://evo-reformas.vercel.app/'
 /** screenshots of the live site placed in depth; z in px, x/y/w in viewport units (m* = phone) */
 const PLANES = [
-  { img: 'evo-1', x: 8, y: -3, z: 0, w: 50, mx: 0, my: -15, mw: 86 },
-  { img: 'evo-2', x: 24, y: 9, z: -950, w: 40, mx: 9, my: -8, mw: 78 },
-  { img: 'evo-3', x: 2, y: 4, z: -1900, w: 44, mx: -9, my: -18, mw: 80 },
-  { img: 'evo-mobile', x: 26, y: -2, z: -2750, w: 15, mx: 10, my: -11, mw: 40 },
-  { img: 'evo-4', x: 10, y: 1, z: -3600, w: 46, mx: 0, my: -2, mw: 80 },
+  { img: 'evo-1', x: 17, y: -3, z: 0, w: 44, mx: 0, my: -15, mw: 82 },
+  { img: 'evo-2', x: 20, y: 2, z: -950, w: 42, mx: 5, my: -13, mw: 76 },
+  { img: 'evo-3', x: 16, y: -1, z: -1900, w: 42, mx: -5, my: -15, mw: 76 },
+  { img: 'evo-mobile', x: 21, y: -2, z: -2750, w: 15, mx: 6, my: -13, mw: 38 },
+  { img: 'evo-4', x: 18, y: -10, z: -3600, w: 35, mx: 0, my: -4, mw: 72 },
 ]
 const TRAVEL = 3900
 
@@ -34,7 +34,8 @@ export function Work() {
         space.style.transform = `translate3d(0,0,${travel.toFixed(1)}px)`
         planes.forEach((pl, i) => {
           const z = PLANES[i].z + travel
-          const o = clamp01((z + 3300) / 1300) * (1 - clamp01((z - 260) / 420))
+          // one screenshot is clear at a time: the next fades up as the current one leaves
+          const o = clamp01((z + 1050) / 650) * (1 - clamp01((z - 30) / 260))
           pl.style.opacity = o.toFixed(3)
           pl.style.visibility = o < 0.01 ? 'hidden' : 'visible'
         })
@@ -86,7 +87,6 @@ export function Work() {
                 href={URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                data-cursor={`label:${t.cursor.visit}`}
                 style={{
                   ['--x' as string]: `${p.x}vw`,
                   ['--y' as string]: `${p.y}vh`,

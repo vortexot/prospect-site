@@ -85,8 +85,8 @@ function Site() {
     const st = ScrollTrigger.create({
       trigger: '#about',
       start: 'top 75%',
-      endTrigger: '#work',
-      end: 'bottom 40%',
+      endTrigger: '#process',
+      end: 'top 85%',
       onToggle: (s) => gsap.to(S, { dim: s.isActive ? 1 : 0, duration: 1.4, ease: 'power2.inOut', overwrite: 'auto' }),
     })
     return () => st.kill()

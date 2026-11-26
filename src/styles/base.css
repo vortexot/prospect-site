@@ -290,12 +290,27 @@ a:focus-visible .roll::after {
   justify-content: space-between;
   padding: 1.35rem var(--gutter);
   color: var(--white);
-  mix-blend-mode: difference;
   pointer-events: none;
 }
 
 .nav > * {
+  position: relative;
   pointer-events: auto;
+}
+
+/* once the page scrolls, content passing underneath fades out behind the header
+   instead of tangling with the logo and links */
+.nav::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 -1.1rem;
+  background: linear-gradient(to bottom, var(--bg) 0, var(--bg) 72%, rgba(5, 5, 5, 0));
+  opacity: 0;
+  transition: opacity var(--t2) var(--ease-out);
+}
+
+.nav.is-compact::before {
+  opacity: 1;
 }
 
 .nav-logo {
@@ -493,8 +508,7 @@ a:focus-visible .roll::after {
 }
 
 .cur-dot,
-.cur-ring,
-.cur-lens {
+.cur-ring {
   position: fixed;
   left: 0;
   top: 0;
@@ -543,32 +557,8 @@ a:focus-visible .roll::after {
   white-space: nowrap;
 }
 
-.cur-ring.is-link {
-  width: 62px;
-  height: 62px;
-  margin: -31px 0 0 -31px;
-  border-color: var(--white);
-}
-
-.cur-ring.is-label {
-  width: 82px;
-  height: 82px;
-  margin: -41px 0 0 -41px;
-  background: var(--white);
-  border-color: var(--white);
-  color: var(--bg);
-  mix-blend-mode: normal;
-}
-
-.cursor-in .cur-ring.is-label ~ .cur-dot,
-.cursor-in .cur-ring.is-hidden ~ .cur-dot {
-  opacity: 0;
-}
-
-.cur-ring.is-label.is-object {
-  width: 104px;
-  height: 104px;
-  margin: -52px 0 0 -52px;
+.cur-dot {
+  transition: scale var(--t1) var(--ease-out);
 }
 
 .cur-ring.is-down {
@@ -577,34 +567,30 @@ a:focus-visible .roll::after {
   margin: -13px 0 0 -13px;
 }
 
-.cur-ring.is-label.is-down {
-  width: 70px;
-  height: 70px;
-  margin: -35px 0 0 -35px;
-}
-
-.cursor-in .cur-ring.is-hidden {
+/* over links the ring steps aside so it never frames over their text */
+.cursor-in .cur-ring.is-link {
   opacity: 0;
 }
 
-.cur-lens {
-  width: 260px;
-  height: 260px;
-  margin: -130px 0 0 -130px;
-  border-radius: 50%;
-  background-size: cover;
-  background-position: center;
-  filter: grayscale(1) contrast(1.08);
-  clip-path: circle(0% at 50% 50%);
-  transition: clip-path 0.6s var(--ease-out);
+.cur-ring.is-link ~ .cur-dot {
+  scale: 2.4;
 }
 
-.cursor-in .cur-lens {
-  opacity: 1;
-}
-
-.cur-lens.is-on {
-  clip-path: circle(50% at 50% 50%);
+/* the label is a small tag below-right of the pointer, clear of the content under it */
+.cur-ring.is-label {
+  width: max-content;
+  height: 28px;
+  margin: 20px 0 0 18px;
+  padding: 0 12px;
+  border-radius: 28px;
+  background: var(--white);
+  border-color: var(--white);
+  color: var(--bg);
+  mix-blend-mode: normal;
+  transition:
+    background-color var(--t1),
+    border-color var(--t1),
+    opacity var(--t1);
 }
 
 /* ---------------- preloader ---------------- */
@@ -729,6 +715,11 @@ a:focus-visible .roll::after {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* static layout: the structure sits behind, so text blocks are fully opaque */
+  .proc-step {
+    background: var(--bg) !important;
+  }
+
   *,
   *::before,
   *::after {

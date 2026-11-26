@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { clamp01, MQ, reducedMotion } from '../core/env'
-import { S } from '../core/sceneState'
+import { S, toBox } from '../core/sceneState'
 import { useI18n } from '../i18n'
 
 /** One structure, four states: fragments → geometry → construction → light. */
@@ -11,6 +11,36 @@ export function Process() {
   const root = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
   const activeRef = useRef(0)
+
+  // tell the 3D scene where the empty space is (offsets ignore the steps' entrance transforms)
+  useEffect(() => {
+    const el = root.current!
+    const measure = () => {
+      const q = (s: string) => el.querySelector<HTMLElement>(s)!
+      const steps = q('.proc-steps')
+      const items = [...el.querySelectorAll<HTMLElement>('.proc-step')]
+      const vw = window.innerWidth
+      const vh = window.innerHeight
+      if (vw >= 900) {
+        const textRight = q('.proc-inner').offsetLeft + steps.offsetLeft + steps.offsetWidth
+        const trackTop = q('.proc-track').offsetTop
+        S.procBox = toBox(textRight + 32, 76, vw - 24, (trackTop || vh) - 12)
+      } else {
+        const textTop = steps.offsetTop + Math.min(...items.map((s) => s.offsetTop))
+        S.procBox = toBox(0, q('.proc-title').offsetTop + q('.proc-title').offsetHeight + 4, vw, textTop - 8)
+      }
+    }
+    const ro = new ResizeObserver(measure)
+    ro.observe(el)
+    el.querySelectorAll('.proc-step').forEach((s) => ro.observe(s))
+    window.addEventListener('resize', measure)
+    document.fonts.ready.then(measure)
+    measure()
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('resize', measure)
+    }
+  }, [t])
 
   useEffect(() => {
     const el = root.current!

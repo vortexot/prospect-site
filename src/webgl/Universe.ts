@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js'
 import { MARK_BODY, MARK_TIP, type Point } from '../brand/logoPaths'
-import { S } from '../core/sceneState'
+import { S, type Box } from '../core/sceneState'
 import { clamp01, easeInOut, lerp } from '../core/env'
 
 const TAU = Math.PI * 2
@@ -120,6 +120,9 @@ export class Universe {
   private idleRendered = false
   private downgraded = false
   private touching = false
+  private groupY = 0
+  private groupS = 1
+  private lastOpacity = ''
   private disposables: { dispose(): void }[] = []
   private n: number
   private height: number
@@ -472,7 +475,6 @@ export class Universe {
     const conv = clamp01(S.converge)
     const follow = (1 - explode) * (1 - pm)
     const heroLive = explode < 0.04 && pm < 0.04 && conv === 0
-    const wide = this.camera.aspect > 1.1
 
     // hover picking (hero only)
     if (this.pointerMoved && heroLive) {
@@ -515,14 +517,20 @@ export class Universe {
       sl.root.visible = sl.cur.s > 0.002
     }
 
-    // group placement
-    const heroX = wide ? 1.25 : 0
-    const processX = wide ? 2.35 : 0
-    const gx = lerp(lerp(heroX, heroX * 0.4, explode), processX, pm) * (1 - conv)
-    this.groupX = lerp(this.groupX, gx, easeK(0.05))
-    this.group.position.x = this.groupX
-    // portrait: during the process the structure rises so the step text reads below it
-    this.group.position.y = lerp(this.group.position.y, wide ? 0 : 1.35 * pm * (1 - conv), easeK(0.05))
+    // group placement: the structure only lives inside the free area each section measured
+    const zMul = this.zMul()
+    const hero = this.fit(S.heroBox, 11 * zMul)
+    const proc = this.fit(S.procBox, 11.2 * zMul)
+    const near = (n: number) => Math.max(0, 1 - Math.abs(stage - n))
+    // the grid (stage 1) and the exploded scaffold (stage 2) are larger than the tower
+    const procS = proc.s * (1 - near(2) * 0.22 - (this.opts.lowPower ? 0 : near(1) * 0.2))
+    const tx = lerp(lerp(hero.x, 0, explode), proc.x, pm) * (1 - conv)
+    const ty = lerp(lerp(hero.y, 0, explode), proc.y, pm) * (1 - conv)
+    this.groupX = lerp(this.groupX, tx, easeK(0.05))
+    this.groupY = lerp(this.groupY, ty, easeK(0.05))
+    this.groupS = lerp(this.groupS, lerp(lerp(hero.s, 1, explode), procS, pm), easeK(0.06))
+    this.group.position.set(this.groupX, this.groupY, 0)
+    this.group.scale.setScalar(this.groupS)
     const rotHero = 0.35 + S.spin + S.px * 0.4 * follow
     const rotProcess = S.px * 0.12 + (stage > 2 ? (stage - 2) * 0.9 : 0)
     this.group.rotation.y = lerp(this.group.rotation.y, lerp(rotHero, rotProcess, pm), easeK(0.045))
@@ -544,18 +552,18 @@ export class Universe {
     this.edgeSolid.opacity = 0.2 + pm * smooth(1.5, 2.3, stage) * 0.45 + lit * 0.25
     this.edgeOutline.opacity = 0.7 + lit * 0.3
     this.scene.environmentIntensity = (0.95 + lit * 0.4) * (1 - S.dim * 0.55) * (1 - conv * 0.8)
-    this.light.position.lerp(this.tmp.v.set(S.px * 4.2 + this.groupX, S.py * 3, 3.4), easeK(0.06))
+    this.light.position.lerp(this.tmp.v.set(S.px * 4.2 + this.groupX, S.py * 3 + this.groupY, 3.4), easeK(0.06))
     this.light.intensity = 26 * (1 - conv)
 
     // core glow follows the core slice
     const core = this.slices.find((s) => s.kind === 'core')!
     core.root.getWorldPosition(this.coreGlow.position)
-    this.coreGlow.scale.setScalar(2.4 * core.cur.s + lit * 2)
+    this.coreGlow.scale.setScalar((2.4 * core.cur.s + lit * 2) * this.groupS)
     ;(this.coreGlow.material as THREE.SpriteMaterial).opacity = (0.22 + lit * 0.55) * (1 - conv)
 
     // singularity at the end
     const sPeak = Math.sin(Math.PI * clamp01((conv - 0.55) / 0.45))
-    this.singularity.position.set(this.groupX, 0, 0.5)
+    this.singularity.position.set(this.groupX, this.groupY, 0.5)
     this.singularity.scale.setScalar(0.001 + sPeak * 1.6)
     ;(this.singularity.material as THREE.SpriteMaterial).opacity = sPeak
 
@@ -574,6 +582,10 @@ export class Universe {
     u.uFade.value = 1 - S.dim * 0.45
     u.uPixel.value = this.renderer.getPixelRatio()
 
+    // behind reading sections the 3D layer recedes so it never competes with the text
+    const opacity = (1 - Math.max(S.dim * 0.74, S.hush * 0.6)).toFixed(2)
+    if (opacity !== this.lastOpacity) this.canvas.style.opacity = this.lastOpacity = opacity
+
     this.renderer.render(this.scene, this.camera)
     this.idleRendered = conv >= 0.999 && this.slices.every((s) => s.cur.s < 0.004)
   }
@@ -591,30 +603,47 @@ export class Universe {
       const m = this.frameMats[k]
       if (k === 0) {
         const heroQ = a.q.setFromEuler(e.set(0.08, 0.8 + this.time * 0.035, 0))
-        f.position.set(lerp(this.groupX - 0.6, 0, explode), lerp(0.35, 0, explode), lerp(-2.4, 0, explode))
+        const g = this.groupS
+        f.position.set(lerp(this.groupX, 0, explode), lerp(this.groupY + 0.2 * g, 0, explode), lerp(-1.6, 0, explode))
         f.quaternion.copy(heroQ).slerp(new THREE.Quaternion(), explode)
-        f.scale.setScalar(lerp(3.7, fitH, explode))
+        f.scale.setScalar(lerp(2.7 * g, fitH, explode))
         m.opacity = (0.3 + 0.6 * explode) * (1 - smooth(0.86, 1, S.explode)) * hide
       } else {
         const dir = k === 1 ? 1 : -1
-        f.position.set(this.groupX + dir * 0.2, k === 1 ? -0.4 : 0.6, k === 1 ? 0.6 : -1)
+        const g = this.groupS
+        f.position.set(this.groupX + dir * 0.2 * g, this.groupY + (k === 1 ? -0.4 : 0.5) * g, k === 1 ? 0.6 : -1)
         f.rotation.set(0.15 * dir, -this.time * 0.05 * dir + k * 1.7, 0.08 * dir)
-        f.scale.setScalar((k === 1 ? 2.3 : 5.2) * (1 + explode * 2.5))
+        f.scale.setScalar((k === 1 ? 2.2 : 2.8) * g * (1 + explode * 3.5))
         m.opacity = (k === 1 ? 0.22 : 0.14) * (1 - explode) * hide
       }
       f.visible = m.opacity > 0.005
     })
   }
 
-  private updateCamera(explode: number, pm: number, conv: number, easeK: (l: number) => number) {
+  /** Portrait screens pull the camera back so the structure keeps its width. */
+  private zMul() {
     const aspect = this.camera.aspect
-    const zMul = aspect < 1 ? 1 + (1 - aspect) * 0.95 : 1
+    return aspect < 1 ? 1 + (1 - aspect) * 0.95 : 1
+  }
+
+  /** World position and scale that keep the tower (about 5 × 7.2 units) inside a screen box. */
+  private fit(box: Box, z: number) {
+    const visH = 2 * z * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))
+    const visW = visH * this.camera.aspect
+    return {
+      x: (box.x - 0.5) * visW,
+      y: 0.1 + (0.5 - box.y) * visH,
+      s: Math.max(0.2, Math.min(1, (box.w * visW) / 5, (box.h * visH) / 7.2)),
+    }
+  }
+
+  private updateCamera(explode: number, pm: number, conv: number, easeK: (l: number) => number) {
     const follow = this.opts.reduced ? 0 : 1
-    const z = lerp(lerp(lerp(11, 7.4, explode), 11.2, pm), 8.6, conv) * zMul
-    const target = this.tmp.v.set(S.px * 0.6 * follow * (1 - pm * 0.6), -0.3 + S.py * 0.32 * follow, z)
+    const z = lerp(lerp(lerp(11, 7.4, explode), 11.2, pm), 8.6, conv) * this.zMul()
+    const target = this.tmp.v.set(S.px * 0.45 * follow * (1 - pm * 0.6), -0.3 + S.py * 0.25 * follow, z)
     this.camPos.lerp(target, easeK(0.035))
     this.camera.position.copy(this.camPos)
-    this.camLook.set(this.groupX * lerp(0.35, 0.55, pm) * (1 - explode * 0.6), 0.1, 0)
+    this.camLook.set(0, 0.1, 0)
     this.camera.lookAt(this.camLook)
   }
 

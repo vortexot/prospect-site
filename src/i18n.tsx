@@ -12,7 +12,7 @@ const pt = {
   loader: { skip: 'Pular intro', loading: 'Carregando o universo Prospect' },
   hero: {
     label: 'ESTÚDIO DIGITAL INDEPENDENTE — 2026',
-    title: ['Transformamos', 'ideias em experiências', 'digitais.'],
+    title: ['Transformamos', 'ideias em', 'experiências', 'digitais.'],
     sub: 'Sites, sistemas e soluções digitais feitos para fazer negócios avançarem.',
     explore: 'EXPLORE NOSSO UNIVERSO',
     start: 'INICIAR UM PROJETO',

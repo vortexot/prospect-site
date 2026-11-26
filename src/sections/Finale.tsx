@@ -19,9 +19,10 @@ export function Finale() {
       const tl = gsap.timeline({
         scrollTrigger: { trigger: el, start: 'top top', end: () => `+=${window.innerHeight * 1.7}`, pin: true, scrub: true, anticipatePin: 1 },
       })
-      tl.to(S, { converge: 1, duration: 1, ease: 'none' }, 0)
-        .fromTo('.fin-in', { yPercent: 115, '--fw': 62 }, { yPercent: 0, '--fw': 100, duration: 0.32, stagger: 0.07, ease: 'power3.out' }, 0.62)
-        .fromTo(['.fin-sub', '.fin-cta'], { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.2, stagger: 0.05 }, 0.82)
+      // the structure finishes collapsing first; only then does the text appear in the clear
+      tl.to(S, { converge: 1, duration: 0.7, ease: 'none' }, 0)
+        .fromTo('.fin-in', { yPercent: 115, '--fw': 62 }, { yPercent: 0, '--fw': 100, duration: 0.24, stagger: 0.06, ease: 'power3.out' }, 0.76)
+        .fromTo(['.fin-sub', '.fin-cta'], { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, duration: 0.16, stagger: 0.05 }, 0.92)
         .to({}, { duration: 0.15 })
       return () => {
         S.converge = 0

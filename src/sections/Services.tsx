@@ -30,8 +30,8 @@ export function Services() {
         gsap.fromTo(plate.querySelector('img'), { yPercent: -8, scale: 1.18 }, { yPercent: 8, scale: 1.18, ease: 'none', scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: true } })
         gsap.from(row.querySelector('.svc-desc'), { y: 40, autoAlpha: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: row, start: 'top 70%' } })
       })
-    // smaller drift on phones so long words never leave the screen
-    mm.add(MQ.immersive, () => rows(isNarrow() ? 5 : 9))
+    // small drift: the words move, but never leave the screen
+    mm.add(MQ.immersive, () => rows(isNarrow() ? 2 : 2.5))
     return () => mm.revert()
   }, [])
 
@@ -47,7 +47,7 @@ export function Services() {
             <img src={IMAGES[i]} alt="" loading="lazy" decoding="async" />
             <span className="svc-shutter" />
           </figure>
-          <h3 className="svc-title" data-cursor={`lens:${IMAGES[i]}`} style={{ ['--img' as string]: `url("${IMAGES[i]}")` }}>
+          <h3 className="svc-title">
             {it.title.map((l, j) => (
               <span className="svc-line" key={j}>
                 {l}

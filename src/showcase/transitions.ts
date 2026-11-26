@@ -41,7 +41,7 @@ const displace: Transition = {
 const iris: Transition = {
   in: (t) => {
     const e = easeInOut(t)
-    return { clip: `circle(${(e * 80).toFixed(2)}% at 50% 56%)`, transform: `scale(${(1.12 - e * 0.12).toFixed(4)})` }
+    return { clip: `circle(${(e * 125).toFixed(2)}% at 78% 48%)`, transform: `scale(${(1.12 - e * 0.12).toFixed(4)})` }
   },
   out: (t) => ({ transform: `scale(${1 + easeInOut(t) * 0.14})`, shade: easeInOut(t) * 0.5 }),
 }

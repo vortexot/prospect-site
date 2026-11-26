@@ -3,10 +3,14 @@
    src/core/env.ts), with portrait adjustments under (max-width: 899px). */
 
 /* ================= HERO ================= */
+/* a column: label, headline, free space, supporting text, footnote — nothing can collide */
 .hero {
   position: relative;
+  display: flex;
+  flex-direction: column;
   height: 100svh;
-  min-height: 36rem;
+  min-height: 34rem;
+  padding: 5.5rem var(--gutter) 1.5rem;
   user-select: none;
   -webkit-user-select: none;
   touch-action: pan-y;
@@ -17,9 +21,6 @@
 }
 
 .hero-label {
-  position: absolute;
-  top: 5.6rem;
-  left: var(--gutter);
   font-size: 0.7rem;
   font-weight: 500;
   font-stretch: 110%;
@@ -28,16 +29,12 @@
 }
 
 .hero-title {
-  position: absolute;
-  top: 7.6rem;
-  left: var(--gutter);
-  right: var(--gutter);
-  font-size: clamp(2.6rem, 11.5vw, 9.4rem);
+  margin-top: 1rem;
+  font-size: min(11.5vw, 6.8svh, 5.5rem);
   font-weight: 600;
-  line-height: 0.9;
+  line-height: 0.92;
   letter-spacing: -0.035em;
   color: var(--white);
-  mix-blend-mode: difference;
 }
 
 .h-line {
@@ -63,10 +60,7 @@
 }
 
 .hero-side {
-  position: absolute;
-  left: var(--gutter);
-  right: var(--gutter);
-  bottom: 5.5rem;
+  margin-top: auto;
   max-width: 24rem;
 }
 
@@ -84,10 +78,7 @@
 }
 
 .hero-foot {
-  position: absolute;
-  left: var(--gutter);
-  right: var(--gutter);
-  bottom: 1.75rem;
+  margin-top: 1.5rem;
   display: flex;
   justify-content: space-between;
   font-size: 0.68rem;
@@ -129,43 +120,40 @@
 }
 
 @media (min-width: 900px) {
+  .hero {
+    padding-top: 6.4rem;
+    padding-bottom: 1.75rem;
+  }
   .hero-title {
-    top: 8.4rem;
-    font-size: min(6.5vw, 13.5svh);
-  }
-  .hero-title .h-line:nth-child(2) {
-    padding-left: 7vw;
-  }
-  .hero-title .h-line:nth-child(3) {
-    padding-left: 31vw;
-  }
-  .hero-label {
-    top: 6.4rem;
+    font-size: min(6vw, 11svh);
   }
   .hero-side {
-    left: auto;
-    bottom: 6.5rem;
-    width: min(24rem, 32vw);
+    margin-bottom: 1rem;
+    max-width: min(24rem, 34vw);
   }
 }
 
 @media (max-width: 899px) {
-  .hero::after {
-    content: '';
-    position: absolute;
-    inset: 45% 0 0;
-    background: linear-gradient(to bottom, rgba(5, 5, 5, 0), rgba(5, 5, 5, 0.88) 45%);
-    pointer-events: none;
-  }
-  .hero-side,
-  .hero-foot {
-    z-index: 1;
-  }
-  .hero-title .h-line:nth-child(2) {
-    padding-left: 6vw;
-  }
   .hero-foot .hero-hint {
     display: none;
+  }
+  .hero-ctas {
+    margin-top: 1.1rem;
+  }
+  .hero-ctas .btn {
+    min-height: 2.9rem;
+    padding: 0 1.1rem;
+    font-size: 0.68rem;
+  }
+}
+
+/* short screens: drop the scroll footnote so the headline, the 3D and the buttons all fit */
+@media (max-height: 700px) {
+  .hero-foot {
+    display: none;
+  }
+  .hero-sub {
+    font-size: var(--fs-s);
   }
 }
 
@@ -532,6 +520,36 @@
   }
 }
 
+/* tablets / small laptops: the index is a row of chips, so the frame starts lower */
+@media (min-width: 900px) and (max-width: 1199px) and (prefers-reduced-motion: no-preference) {
+  .sc-frame {
+    --fw: min(calc(100vw - var(--gutter) * 2), calc((100svh - 21rem) * 1.6));
+    top: calc(50% + 5.75rem);
+  }
+}
+
+/* short laptop screens: compact index so all eight entries stay on screen */
+@media (min-width: 1200px) and (max-height: 780px) and (prefers-reduced-motion: no-preference) {
+  .sc-side {
+    top: 5.25rem;
+    bottom: 1rem;
+  }
+  .sc-title {
+    font-size: 2rem;
+  }
+  .sc-intro,
+  .sc-note {
+    display: none;
+  }
+  .sc-ind {
+    margin-top: 1.25rem;
+  }
+  .sc-ind button {
+    padding: 0.36rem 0;
+    font-size: 0.8rem;
+  }
+}
+
 /* ================= ABOUT ================= */
 .ab {
   position: relative;
@@ -656,31 +674,31 @@
     grid-template-columns: repeat(12, minmax(0, 1fr));
     grid-template-rows: auto auto;
     column-gap: 1.25rem;
-    row-gap: 0;
+    row-gap: 7vh;
     min-height: 74vh;
     align-content: center;
     padding: 9vh var(--gutter);
   }
+  /* the word owns the first row; image and text share the second, never on top of it */
   .svc-title {
     grid-row: 1;
     grid-column: 1 / -1;
   }
   .svc-plate {
-    grid-row: 1 / span 2;
+    grid-row: 2;
     align-self: start;
   }
   .svc-desc {
     grid-row: 2;
-    margin-top: 5vh;
-    align-self: start;
+    align-self: end;
   }
   /* each service gets its own composition */
   .svc-row--0 .svc-plate {
     grid-column: 8 / 12;
-    margin-top: 12vh;
   }
   .svc-row--0 .svc-desc {
     grid-column: 2 / 6;
+    align-self: start;
   }
   .svc-row--1 .svc-title {
     align-items: flex-end;
@@ -688,41 +706,40 @@
   }
   .svc-row--1 .svc-plate {
     grid-column: 2 / 6;
-    margin-top: 4vh;
   }
   .svc-row--1 .svc-desc {
     grid-column: 9 / 13;
   }
   .svc-row--2 .svc-title {
-    padding-left: 9vw;
+    padding-left: 6vw;
   }
   .svc-row--2 .svc-plate {
     grid-column: 6 / 10;
-    margin-top: 14vh;
     aspect-ratio: 4 / 3;
   }
   .svc-row--2 .svc-desc {
     grid-column: 1 / 5;
+    align-self: start;
   }
   .svc-row--3 .svc-line:nth-child(2) {
-    padding-left: 10vw;
+    padding-left: 8vw;
   }
   .svc-row--3 .svc-plate {
     grid-column: 9 / 13;
-    margin-top: 2vh;
     aspect-ratio: 3 / 4;
-    width: 72%;
+    width: 66%;
     justify-self: end;
   }
   .svc-row--3 .svc-desc {
     grid-column: 2 / 6;
+    align-self: start;
   }
 }
 
-/* phone: same editorial idea as desktop, giant words overlapping offset images */
+/* phone: word, then image, then text — offset widths keep the editorial rhythm */
 @media (max-width: 899px) {
   .svc-title {
-    margin-top: -2.9rem;
+    order: -1;
   }
   .svc-row--0 .svc-plate {
     width: 84%;
@@ -1062,7 +1079,7 @@
     flex: 1;
     margin: 0;
     padding: 0;
-    width: min(34rem, 44vw);
+    width: min(30rem, 36vw);
   }
   .proc-step {
     position: absolute;
@@ -1121,13 +1138,6 @@
   .proc-inner {
     padding: 5.25rem var(--gutter) 1.25rem;
   }
-  .proc-inner::before {
-    content: '';
-    position: absolute;
-    inset: 50% 0 0;
-    background: linear-gradient(to bottom, rgba(5, 5, 5, 0), rgba(5, 5, 5, 0.9) 45%);
-    pointer-events: none;
-  }
   .proc-steps {
     width: 100%;
   }
@@ -1147,8 +1157,11 @@
     position: relative;
   }
   .proc-track ol {
+    grid-template-columns: repeat(4, auto);
+    justify-content: space-between;
+    gap: 0.5rem;
     font-size: 0.6rem;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.04em;
   }
 }
 
@@ -1199,7 +1212,7 @@
 /* ================= FOOTER ================= */
 .foot {
   padding: 7rem var(--gutter) 2rem;
-  background: linear-gradient(to bottom, transparent, var(--bg) 8rem);
+  background: var(--bg);
 }
 
 .foot-line {
