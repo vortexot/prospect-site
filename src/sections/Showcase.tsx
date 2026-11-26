@@ -76,7 +76,7 @@ export function Showcase() {
     const mm = gsap.matchMedia()
     const warm = ScrollTrigger.create({ trigger: el, start: 'top 250%', once: true, onEnter: () => warmImages(el) })
 
-    // ---------- desktop: pinned, scroll-scrubbed ----------
+    // ---------- pinned, scroll-scrubbed (desktop and phone) ----------
     mm.add(MQ.immersive, () => {
       const unit = () => window.innerHeight * 0.62
       const side = el.querySelector<HTMLElement>('.sc-side')!
@@ -110,7 +110,23 @@ export function Showcase() {
       intro(0)
       render(0)
 
-      goRef.current = (k) => scrollToY(pin.start + (holdAt(k) / UNITS) * (pin.end - pin.start), 1.6)
+      goRef.current = (k) => scrollToY(pin.start + (holdAt(Math.max(0, Math.min(COUNT - 1, k))) / UNITS) * (pin.end - pin.start), 1.6)
+
+      // touch: a sideways swipe on the frame jumps between worlds
+      let sx = 0
+      let sy = 0
+      const vp = viewport.current!
+      const down = (e: PointerEvent) => {
+        sx = e.clientX
+        sy = e.clientY
+      }
+      const up = (e: PointerEvent) => {
+        if (e.pointerType === 'mouse') return
+        const dx = e.clientX - sx
+        if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(e.clientY - sy)) goRef.current(activeRef.current + (dx < 0 ? 1 : -1))
+      }
+      vp.addEventListener('pointerdown', down)
+      vp.addEventListener('pointerup', up)
 
       // idle autoplay: advance to the next world when the visitor stops scrolling inside the pin
       let lastInput = performance.now()
@@ -149,12 +165,14 @@ export function Showcase() {
         window.clearInterval(timer)
         events.forEach((ev) => window.removeEventListener(ev, touch))
         el.removeEventListener('pointermove', onMove)
+        vp.removeEventListener('pointerdown', down)
+        vp.removeEventListener('pointerup', up)
         ;[frame.current!, side].forEach((n) => n.removeAttribute('style'))
         gsap.set(tilt.current!, { clearProps: 'all' })
       }
     })
 
-    // ---------- mobile / reduced motion: self-running frame, no pin ----------
+    // ---------- reduced motion: static frame with controls, no pin ----------
     mm.add(MQ.compact, () => {
       const state = { p: holdAt(0) }
       render(state.p)
@@ -196,18 +214,6 @@ export function Showcase() {
         window.clearInterval(timer)
         vp.removeEventListener('pointerdown', down)
         vp.removeEventListener('pointerup', up)
-      }
-    })
-
-    // phones: the frame grows into place as it enters, scrubbed by the thumb (transform/opacity only)
-    mm.add(MQ.touchMotion, () => {
-      gsap.fromTo(
-        frame.current,
-        { scale: 0.9, autoAlpha: 0.35 },
-        { scale: 1, autoAlpha: 1, ease: 'none', scrollTrigger: { trigger: frame.current, start: 'top 95%', end: 'top 45%', scrub: true } },
-      )
-      return () => {
-        gsap.set(frame.current, { clearProps: 'transform,opacity,visibility' })
       }
     })
 

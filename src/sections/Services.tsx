@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { MQ } from '../core/env'
+import { isNarrow, MQ } from '../core/env'
 import { useI18n } from '../i18n'
 
 const IMAGES = ['/services/websites.webp', '/showcase/clinic-2-sm.webp', '/services/systems.svg', '/showcase/arch-2-sm.webp']
@@ -30,9 +30,8 @@ export function Services() {
         gsap.fromTo(plate.querySelector('img'), { yPercent: -8, scale: 1.18 }, { yPercent: 8, scale: 1.18, ease: 'none', scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: true } })
         gsap.from(row.querySelector('.svc-desc'), { y: 40, autoAlpha: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: row, start: 'top 70%' } })
       })
-    mm.add(MQ.immersive, () => rows(9))
-    // phones: the same reveal, with a smaller drift so long words never leave the screen
-    mm.add(MQ.touchMotion, () => rows(4))
+    // smaller drift on phones so long words never leave the screen
+    mm.add(MQ.immersive, () => rows(isNarrow() ? 5 : 9))
     return () => mm.revert()
   }, [])
 

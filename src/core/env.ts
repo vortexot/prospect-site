@@ -11,11 +11,14 @@ export const lowPower =
 
 /** gsap.matchMedia conditions shared by every section. */
 export const MQ = {
-  immersive: '(min-width: 900px) and (prefers-reduced-motion: no-preference)',
-  compact: '(max-width: 899px), (prefers-reduced-motion: reduce)',
-  /** phones and tablets that accept motion: scroll-linked, transform/opacity only, no pinning */
-  touchMotion: '(max-width: 899px) and (prefers-reduced-motion: no-preference)',
+  /** the full pinned, scroll-scrubbed experience on every screen size */
+  immersive: '(prefers-reduced-motion: no-preference)',
+  /** static layout, only for visitors who ask for reduced motion */
+  compact: '(prefers-reduced-motion: reduce)',
 }
+
+/** Phone / portrait-tablet layout (same breakpoint as the CSS). */
+export const isNarrow = () => window.innerWidth < 900
 
 export function hasWebGL() {
   try {

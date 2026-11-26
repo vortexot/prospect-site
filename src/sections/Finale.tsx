@@ -27,19 +27,8 @@ export function Finale() {
         S.converge = 0
       }
     }, el)
-    // phones that accept motion: the same collapse, scrubbed by the thumb (no pinning)
-    mm.add(MQ.touchMotion, () => {
-      gsap
-        .timeline({ scrollTrigger: { trigger: el, start: 'top 85%', end: 'center center', scrub: true } })
-        .to(S, { converge: 1, ease: 'none' }, 0)
-        .fromTo('.fin-in', { yPercent: 115 }, { yPercent: 0, stagger: 0.12, ease: 'none' }, 0.35)
-        .fromTo(['.fin-sub', '.fin-cta'], { autoAlpha: 0, y: 26 }, { autoAlpha: 1, y: 0, stagger: 0.1, ease: 'none' }, 0.6)
-      return () => {
-        S.converge = 0
-      }
-    })
     // reduced motion: no scrubbing, the collapse simply settles once the section is reached
-    mm.add('(prefers-reduced-motion: reduce)', () => {
+    mm.add(MQ.compact, () => {
       const st = ScrollTrigger.create({
         trigger: el,
         start: 'top 70%',

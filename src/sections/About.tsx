@@ -18,8 +18,6 @@ export function About() {
         { opacity: 1, ease: 'none', stagger, scrollTrigger: { trigger: el.querySelector('.ab-text'), start, end, scrub: true } },
       )
     mm.add(MQ.immersive, () => void light('top 78%', 'bottom 52%', 0.1))
-    // phones: the words light up as the thumb scrolls, on a shorter stretch of the page
-    mm.add(MQ.touchMotion, () => void light('top 88%', 'bottom 60%', 0.05))
     return () => mm.revert()
   }, [lang])
 

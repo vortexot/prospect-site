@@ -1,6 +1,6 @@
 import { Fragment, useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { finePointer, MQ, reducedMotion } from '../core/env'
+import { finePointer, isNarrow, MQ, reducedMotion } from '../core/env'
 import { S } from '../core/sceneState'
 import { scrollToSection } from '../core/scroll'
 import { useI18n } from '../i18n'
@@ -45,9 +45,7 @@ export function Hero() {
           .to('.hero-title', { yPercent: -38, ease: 'none' }, 0)
           .to('.hero-title', { autoAlpha: 0, ease: 'power1.in' }, 0.15)
           .to(['.hero-side', '.hero-label', '.hero-foot'], { y: -lift, autoAlpha: 0, ease: 'none' }, 0)
-      mm.add(MQ.immersive, () => void scrollOut(90))
-      // phones: the same scroll-out, lighter lift
-      mm.add(MQ.touchMotion, () => void scrollOut(48))
+      mm.add(MQ.immersive, () => void scrollOut(isNarrow() ? 60 : 90))
     }, el)
 
     const reveal = () =>

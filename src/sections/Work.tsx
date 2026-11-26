@@ -6,13 +6,13 @@ import { useI18n } from '../i18n'
 import { Roll } from '../components/Nav'
 
 const URL = 'https://evo-reformas.vercel.app/'
-/** screenshots of the live site placed in depth; z in px, x/y in viewport units */
+/** screenshots of the live site placed in depth; z in px, x/y/w in viewport units (m* = phone) */
 const PLANES = [
-  { img: 'evo-1', x: 8, y: -3, z: 0, w: 50 },
-  { img: 'evo-2', x: 24, y: 9, z: -950, w: 40 },
-  { img: 'evo-3', x: 2, y: 4, z: -1900, w: 44 },
-  { img: 'evo-mobile', x: 26, y: -2, z: -2750, w: 15 },
-  { img: 'evo-4', x: 10, y: 1, z: -3600, w: 46 },
+  { img: 'evo-1', x: 8, y: -3, z: 0, w: 50, mx: 0, my: -15, mw: 86 },
+  { img: 'evo-2', x: 24, y: 9, z: -950, w: 40, mx: 9, my: -8, mw: 78 },
+  { img: 'evo-3', x: 2, y: 4, z: -1900, w: 44, mx: -9, my: -18, mw: 80 },
+  { img: 'evo-mobile', x: 26, y: -2, z: -2750, w: 15, mx: 10, my: -11, mw: 40 },
+  { img: 'evo-4', x: 10, y: 1, z: -3600, w: 46, mx: 0, my: -2, mw: 80 },
 ]
 const TRAVEL = 3900
 
@@ -87,7 +87,15 @@ export function Work() {
                 target="_blank"
                 rel="noopener noreferrer"
                 data-cursor={`label:${t.cursor.visit}`}
-                style={{ ['--x' as string]: `${p.x}vw`, ['--y' as string]: `${p.y}vh`, ['--z' as string]: `${p.z}px`, ['--w' as string]: `${p.w}vw` }}
+                style={{
+                  ['--x' as string]: `${p.x}vw`,
+                  ['--y' as string]: `${p.y}vh`,
+                  ['--z' as string]: `${p.z}px`,
+                  ['--w' as string]: `${p.w}vw`,
+                  ['--mx' as string]: `${p.mx}vw`,
+                  ['--my' as string]: `${p.my}svh`,
+                  ['--mw' as string]: `${p.mw}vw`,
+                }}
               >
                 <img src={`/work/${p.img}.webp`} alt={t.work.alt[i]} loading="lazy" decoding="async" draggable={false} />
               </a>

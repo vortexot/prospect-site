@@ -119,6 +119,7 @@ export class Universe {
   private frameNo = 0
   private idleRendered = false
   private downgraded = false
+  private touching = false
   private disposables: { dispose(): void }[] = []
   private n: number
   private height: number
@@ -303,6 +304,13 @@ export class Universe {
 
     window.addEventListener('resize', this.resize)
     window.addEventListener('pointermove', this.onPointer, { passive: true })
+    // touch screens: the scene follows the finger, also while it is scrolling the page
+    if (!opts.pointer && !opts.reduced) {
+      window.addEventListener('touchstart', this.onTouch, { passive: true })
+      window.addEventListener('touchmove', this.onTouch, { passive: true })
+      window.addEventListener('touchend', this.onTouchEnd, { passive: true })
+      window.addEventListener('touchcancel', this.onTouchEnd, { passive: true })
+    }
     document.addEventListener('visibilitychange', this.onVisibility)
     this.resize()
   }
@@ -333,6 +341,10 @@ export class Universe {
     this.stop()
     window.removeEventListener('resize', this.resize)
     window.removeEventListener('pointermove', this.onPointer)
+    window.removeEventListener('touchstart', this.onTouch)
+    window.removeEventListener('touchmove', this.onTouch)
+    window.removeEventListener('touchend', this.onTouchEnd)
+    window.removeEventListener('touchcancel', this.onTouchEnd)
     document.removeEventListener('visibilitychange', this.onVisibility)
     this.disposables.forEach((d) => d.dispose())
     this.renderer.dispose()
@@ -345,6 +357,24 @@ export class Universe {
     S.px = (e.clientX / window.innerWidth) * 2 - 1
     S.py = -(e.clientY / window.innerHeight) * 2 + 1
     this.pointerMoved = true
+  }
+
+  private onTouch = (e: TouchEvent) => {
+    const t = e.touches[0]
+    if (!t) return
+    this.touching = true
+    S.px = (t.clientX / window.innerWidth) * 2 - 1
+    S.py = -(t.clientY / window.innerHeight) * 2 + 1
+    this.pMat.uniforms.uMouseForce.value = 1
+    this.pointerMoved = true
+  }
+
+  /** finger lifted: the camera eases back to centre */
+  private onTouchEnd = () => {
+    this.touching = false
+    S.px = 0
+    S.py = 0
+    this.pMat.uniforms.uMouseForce.value = 0
   }
 
   private resize = () => {
@@ -491,6 +521,8 @@ export class Universe {
     const gx = lerp(lerp(heroX, heroX * 0.4, explode), processX, pm) * (1 - conv)
     this.groupX = lerp(this.groupX, gx, easeK(0.05))
     this.group.position.x = this.groupX
+    // portrait: during the process the structure rises so the step text reads below it
+    this.group.position.y = lerp(this.group.position.y, wide ? 0 : 1.35 * pm * (1 - conv), easeK(0.05))
     const rotHero = 0.35 + S.spin + S.px * 0.4 * follow
     const rotProcess = S.px * 0.12 + (stage > 2 ? (stage - 2) * 0.9 : 0)
     this.group.rotation.y = lerp(this.group.rotation.y, lerp(rotHero, rotProcess, pm), easeK(0.045))
@@ -531,7 +563,7 @@ export class Universe {
     this.updateCamera(explode, pm, conv, easeK)
 
     // particles
-    if (this.opts.pointer && !reduced) {
+    if ((this.opts.pointer || this.touching) && !reduced) {
       this.ndc.set(S.px, S.py)
       this.raycaster.setFromCamera(this.ndc, this.camera)
       if (this.raycaster.ray.intersectPlane(this.plane, this.mouseTarget)) this.mouseWorld.lerp(this.mouseTarget, easeK(0.12))

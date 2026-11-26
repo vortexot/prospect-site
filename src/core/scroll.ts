@@ -5,6 +5,8 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { finePointer, reducedMotion } from './env'
 
 gsap.registerPlugin(ScrollTrigger)
+// phone browsers resize the viewport when the address bar collapses; don't recompute pins for that
+ScrollTrigger.config({ ignoreMobileResize: true })
 
 export let lenis: Lenis | null = null
 
