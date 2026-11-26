@@ -557,8 +557,13 @@ a:focus-visible .roll::after {
   white-space: nowrap;
 }
 
+/* Never use the `scale`, `rotate` or `translate` properties on the cursor: it is
+   positioned with `transform`, and those properties would multiply that position. */
 .cur-dot {
-  transition: scale var(--t1) var(--ease-out);
+  transition:
+    width var(--t1) var(--ease-out),
+    height var(--t1) var(--ease-out),
+    margin var(--t1) var(--ease-out);
 }
 
 .cur-ring.is-down {
@@ -573,7 +578,9 @@ a:focus-visible .roll::after {
 }
 
 .cur-ring.is-link ~ .cur-dot {
-  scale: 2.4;
+  width: 14px;
+  height: 14px;
+  margin: -7px 0 0 -7px;
 }
 
 /* the label is a small tag below-right of the pointer, clear of the content under it */
