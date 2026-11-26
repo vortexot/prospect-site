@@ -13,6 +13,8 @@ export const lowPower =
 export const MQ = {
   immersive: '(min-width: 900px) and (prefers-reduced-motion: no-preference)',
   compact: '(max-width: 899px), (prefers-reduced-motion: reduce)',
+  /** phones and tablets that accept motion: scroll-linked, transform/opacity only, no pinning */
+  touchMotion: '(max-width: 899px) and (prefers-reduced-motion: no-preference)',
 }
 
 export function hasWebGL() {

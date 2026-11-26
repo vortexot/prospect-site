@@ -199,6 +199,18 @@ export function Showcase() {
       }
     })
 
+    // phones: the frame grows into place as it enters, scrubbed by the thumb (transform/opacity only)
+    mm.add(MQ.touchMotion, () => {
+      gsap.fromTo(
+        frame.current,
+        { scale: 0.9, autoAlpha: 0.35 },
+        { scale: 1, autoAlpha: 1, ease: 'none', scrollTrigger: { trigger: frame.current, start: 'top 95%', end: 'top 45%', scrub: true } },
+      )
+      return () => {
+        gsap.set(frame.current, { clearProps: 'transform,opacity,visibility' })
+      }
+    })
+
     return () => {
       warm.kill()
       mm.revert()

@@ -86,8 +86,6 @@ export function Work() {
                 href={URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                tabIndex={-1}
-                aria-hidden="true"
                 data-cursor={`label:${t.cursor.visit}`}
                 style={{ ['--x' as string]: `${p.x}vw`, ['--y' as string]: `${p.y}vh`, ['--z' as string]: `${p.z}px`, ['--w' as string]: `${p.w}vw` }}
               >

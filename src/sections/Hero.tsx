@@ -39,13 +39,15 @@ export function Hero() {
         gsap.set(['.hero-label', '.hero-side > *', '.hero-foot'], { autoAlpha: 0, y: 22 })
       }
       const mm = gsap.matchMedia()
-      mm.add(MQ.immersive, () => {
+      const scrollOut = (lift: number) =>
         gsap
           .timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom top', scrub: true } })
           .to('.hero-title', { yPercent: -38, ease: 'none' }, 0)
           .to('.hero-title', { autoAlpha: 0, ease: 'power1.in' }, 0.15)
-          .to(['.hero-side', '.hero-label', '.hero-foot'], { y: -90, autoAlpha: 0, ease: 'none' }, 0)
-      })
+          .to(['.hero-side', '.hero-label', '.hero-foot'], { y: -lift, autoAlpha: 0, ease: 'none' }, 0)
+      mm.add(MQ.immersive, () => void scrollOut(90))
+      // phones: the same scroll-out, lighter lift
+      mm.add(MQ.touchMotion, () => void scrollOut(48))
     }, el)
 
     const reveal = () =>
@@ -112,9 +114,8 @@ export function Hero() {
     }
   }, [lang])
 
-  // drag to spin the tower, with inertia on release
+  // drag to spin the tower, with inertia on release. Works with mouse and finger.
   useEffect(() => {
-    if (!finePointer) return
     const el = root.current!
     let down = false
     let lastX = 0

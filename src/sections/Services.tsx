@@ -12,14 +12,14 @@ export function Services() {
   useEffect(() => {
     const el = root.current!
     const mm = gsap.matchMedia()
-    mm.add(MQ.immersive, () => {
+    const rows = (drift: number) =>
       gsap.utils.toArray<HTMLElement>('.svc-row', el).forEach((row, i) => {
         const dir = i % 2 ? -1 : 1
         // words travel through the row; alternate rows travel in opposite directions
         gsap.fromTo(
           row.querySelectorAll('.svc-line'),
-          { xPercent: dir * 9 },
-          { xPercent: -dir * 7, ease: 'none', stagger: 0.04, scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: true } },
+          { xPercent: dir * drift },
+          { xPercent: -dir * drift * 0.78, ease: 'none', stagger: 0.04, scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: true } },
         )
         // the typeface narrows → widens once as the row arrives (a one-off tween, not
         // per scroll frame: re-laying out giant variable text every frame is costly)
@@ -30,7 +30,9 @@ export function Services() {
         gsap.fromTo(plate.querySelector('img'), { yPercent: -8, scale: 1.18 }, { yPercent: 8, scale: 1.18, ease: 'none', scrollTrigger: { trigger: row, start: 'top bottom', end: 'bottom top', scrub: true } })
         gsap.from(row.querySelector('.svc-desc'), { y: 40, autoAlpha: 0, duration: 0.7, ease: 'power3.out', scrollTrigger: { trigger: row, start: 'top 70%' } })
       })
-    })
+    mm.add(MQ.immersive, () => rows(9))
+    // phones: the same reveal, with a smaller drift so long words never leave the screen
+    mm.add(MQ.touchMotion, () => rows(4))
     return () => mm.revert()
   }, [])
 

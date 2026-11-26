@@ -640,22 +640,44 @@
   position: relative;
   padding: 12vh var(--gutter) 10vh;
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
   gap: 2.5rem;
 }
 
 .work-stage {
   order: 2;
+  min-width: 0;
+}
+
+/* phones: all five screenshots in a swipeable row, one at a time */
+.work-space {
+  display: flex;
+  gap: 0.75rem;
+  margin: 0 calc(var(--gutter) * -1);
+  padding: 0 var(--gutter) 0.5rem;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
 }
 
 .work-space {
-  display: grid;
-  grid-template-columns: 1fr 0.42fr;
-  gap: 0.75rem;
-  align-items: start;
+  align-items: center;
+}
+
+.work-space::-webkit-scrollbar {
+  display: none;
+}
+
+/* the phone screenshot is tall: keep it narrow so the row stays compact */
+.work-plane.work-plane--3 {
+  flex-basis: min(46vw, 15rem);
 }
 
 .work-plane {
   display: block;
+  flex: 0 0 min(78vw, 26rem);
+  scroll-snap-align: center;
   overflow: hidden;
   outline: 1px solid var(--line);
   background: var(--surface);
@@ -664,12 +686,6 @@
 .work-plane img {
   width: 100%;
   height: auto;
-}
-
-.work-plane--1,
-.work-plane--2,
-.work-plane--4 {
-  display: none;
 }
 
 .work-info {
@@ -774,6 +790,10 @@
     position: absolute;
     left: 50%;
     top: 50%;
+    margin: 0;
+    padding: 0;
+    /* any overflow other than visible would flatten the 3D and clip the planes */
+    overflow: visible;
     transform-style: preserve-3d;
   }
   .work-plane,
