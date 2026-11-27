@@ -589,7 +589,7 @@ export class Universe {
     u.uPixel.value = this.renderer.getPixelRatio()
 
     // behind reading sections the 3D layer recedes so it never competes with the text
-    const opacity = (1 - Math.max(S.dim * 0.74, S.hush * 0.6)).toFixed(2)
+    const opacity = (1 - Math.max(S.dim * 0.74, S.hush * 0.6, S.faint * 0.6 * (1 - explode) * (1 - pm), S.cover * 0.82)).toFixed(2)
     if (opacity !== this.lastOpacity) this.canvas.style.opacity = this.lastOpacity = opacity
 
     this.renderer.render(this.scene, this.camera)

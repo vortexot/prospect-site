@@ -1,5 +1,10 @@
 {
   "siteUrl": "https://prospect-site-tan.vercel.app",
   "whatsapp": "5561995662684",
-  "whatsappDisplay": "+55 61 99566-2684"
+  "whatsappDisplay": "+55 61 99566-2684",
+  "email": "",
+  "social": [],
+  "team": [],
+  "timeline": { "pt": "", "en": "" },
+  "priceRange": { "pt": "", "en": "" }
 }

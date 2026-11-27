@@ -8,22 +8,29 @@ import { Preloader } from './components/Preloader'
 import { glSupported, universeModule } from './core/earlyUniverse'
 import { finePointer, lowPower, reducedMotion } from './core/env'
 import { S } from './core/sceneState'
-import { initScroll, lockScroll, scrollToSection } from './core/scroll'
+import { anchor, initScroll, lockScroll, scrollToSection, sectionFromHash } from './core/scroll'
 import { LangProvider, useI18n } from './i18n'
 import { initLiquid } from './liquid'
 import { About } from './sections/About'
+import { Faq } from './sections/Faq'
 import { Finale, Footer } from './sections/Finale'
 import { Hero } from './sections/Hero'
 import { Process } from './sections/Process'
 import { Services } from './sections/Services'
 import { Showcase } from './sections/Showcase'
-import { Work } from './sections/Work'
 import type { Universe } from './webgl/Universe'
 
+/** a deep link lands on its section, even though the intro is in front of the page */
+function jumpToHash() {
+  const id = sectionFromHash(location.hash)
+  if (id) scrollToSection(id, { instant: true, push: false })
+}
+
 function Site() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const canvas = useRef<HTMLCanvasElement>(null)
   const [fallback, setFallback] = useState(!glSupported)
+  /** the intro plays on every visit */
   const [loading, setLoading] = useState(true)
   const [boot] = useState(() => {
     let resolveGl: () => void = () => {}
@@ -36,11 +43,56 @@ function Site() {
     }
   })
 
+  const reveal = () => {
+    document.documentElement.classList.add('is-revealed')
+    window.dispatchEvent(new Event('prospect:reveal'))
+    gsap.to(S, { assemble: 1, duration: reducedMotion ? 0 : 2.8, ease: 'power3.out' })
+  }
+  /** nothing behind the intro is focusable or read aloud while it is on screen */
+  const behindIntro = (inert: boolean) => document.querySelectorAll<HTMLElement>('main, .nav, .foot, .skip-link').forEach((n) => (n.inert = inert))
+  const done = () => {
+    setLoading(false)
+    behindIntro(false)
+    lockScroll(false)
+    ScrollTrigger.refresh()
+    jumpToHash()
+  }
+
+  // runs after every section has mounted (and built its triggers)
   useEffect(() => {
     initScroll()
-    lockScroll(true)
     if (reducedMotion) S.assemble = 1
+    lockScroll(true)
+    behindIntro(true)
+
+    window.addEventListener('hashchange', jumpToHash)
+
+    // deep link: the destination is only known once fonts, images and pins are in place
+    let cancelled = false
+    if (location.hash) {
+      history.scrollRestoration = 'manual'
+      const loaded = new Promise<void>((r) => (document.readyState === 'complete' ? r() : window.addEventListener('load', () => r(), { once: true })))
+      Promise.all([document.fonts.ready, loaded]).then(() =>
+        requestAnimationFrame(() => {
+          if (cancelled) return
+          ScrollTrigger.refresh()
+          jumpToHash()
+        }),
+      )
+    }
+    return () => {
+      cancelled = true
+      window.removeEventListener('hashchange', jumpToHash)
+    }
+    // once, on the first mount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // another language means other text lengths: measure the pins again
+  useEffect(() => {
+    const id = requestAnimationFrame(() => ScrollTrigger.refresh())
+    return () => cancelAnimationFrame(id)
+  }, [lang])
 
   // liquid distortion on images, following the cursor (or a moving finger)
   useEffect(() => {
@@ -85,7 +137,7 @@ function Site() {
       c.removeEventListener('webglcontextlost', onLost)
       u?.dispose()
     }
-  }, [boot, glSupported])
+  }, [boot])
 
   // push the debris back while the reading-heavy sections are on screen
   useEffect(() => {
@@ -99,27 +151,9 @@ function Site() {
     return () => st.kill()
   }, [])
 
-  const reveal = () => {
-    document.documentElement.classList.add('is-revealed')
-    window.dispatchEvent(new Event('prospect:reveal'))
-    gsap.to(S, { assemble: 1, duration: reducedMotion ? 0 : 2.8, ease: 'power3.out' })
-  }
-  const done = () => {
-    setLoading(false)
-    lockScroll(false)
-    ScrollTrigger.refresh()
-  }
-
   return (
     <>
-      <a
-        className="skip-link"
-        href="#showcase"
-        onClick={(e) => {
-          e.preventDefault()
-          scrollToSection('showcase')
-        }}
-      >
+      <a className="skip-link" {...anchor('work')}>
         {t.meta.skip}
       </a>
       <canvas ref={canvas} className={`gl ${fallback ? 'is-off' : ''}`} aria-hidden="true" />
@@ -135,8 +169,8 @@ function Site() {
         <Showcase />
         <About />
         <Services />
-        <Work />
         <Process />
+        <Faq />
         <Finale />
       </main>
       <Footer />

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import { MARK_BODY_D, MARK_D, MARK_HOLE_D, MARK_TIP_D } from '../brand/Logo'
 import { clamp01, easeOut, reducedMotion } from '../core/env'
@@ -28,8 +28,7 @@ type Props = { tasks: Promise<unknown>[]; onReveal: () => void; onDone: () => vo
 export function Preloader({ tasks, onReveal, onDone }: Props) {
   const { t } = useI18n()
   const root = useRef<HTMLDivElement>(null)
-  const [showSkip, setShowSkip] = useState(false)
-  const exit = useRef<(fast: boolean) => void>(() => {})
+  const exit = useRef<() => void>(() => {})
 
   useEffect(() => {
     const el = root.current!
@@ -57,7 +56,6 @@ export function Preloader({ tasks, onReveal, onDone }: Props) {
     )
 
     const sweepTween = reducedMotion ? null : gsap.fromTo(sweep, { attr: { x: -160 } }, { attr: { x: 300 }, duration: 1.8, ease: 'power2.inOut', repeat: -1, repeatDelay: 0.5 })
-    const skipTimer = setTimeout(() => !finished && setShowSkip(true), 2000)
 
     const paint = (v: number) => {
       num.textContent = String(Math.round(v * 100)).padStart(3, '0')
@@ -77,19 +75,17 @@ export function Preloader({ tasks, onReveal, onDone }: Props) {
       shown += (cap - shown) * 0.14
       if (cap >= 1 && shown > 0.985) shown = 1
       paint(shown)
-      if (shown === 1 && !finished) exit.current(false)
+      if (shown === 1 && !finished) exit.current()
     }
     gsap.ticker.add(tick)
 
-    exit.current = (fast: boolean) => {
+    exit.current = () => {
       if (finished) return
       finished = true
       gsap.ticker.remove(tick)
       sweepTween?.kill()
-      clearTimeout(skipTimer)
-      setShowSkip(false)
       paint(1)
-      if (reducedMotion || fast) {
+      if (reducedMotion) {
         onReveal()
         gsap.to(el, { autoAlpha: 0, duration: 0.45, ease: 'power2.out', onComplete: onDone })
         return
@@ -107,7 +103,6 @@ export function Preloader({ tasks, onReveal, onDone }: Props) {
     return () => {
       gsap.ticker.remove(tick)
       sweepTween?.kill()
-      clearTimeout(skipTimer)
     }
     // tasks are created once by the parent
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,11 +151,6 @@ export function Preloader({ tasks, onReveal, onDone }: Props) {
         </span>
         <span className="pl-num">000</span>
       </div>
-      {showSkip && (
-        <button className="pl-skip" type="button" onClick={() => exit.current(true)}>
-          {t.loader.skip}
-        </button>
-      )}
     </div>
   )
 }

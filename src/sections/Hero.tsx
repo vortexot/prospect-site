@@ -1,10 +1,12 @@
 import { Fragment, useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { finePointer, isNarrow, MQ, reducedMotion } from '../core/env'
 import { S, toBox } from '../core/sceneState'
-import { scrollToSection } from '../core/scroll'
+import { anchor, scrollToY } from '../core/scroll'
 import { useI18n } from '../i18n'
-import { Roll } from '../components/Nav'
+import { Roll } from '../components/Roll'
+import { WaLink } from '../components/WhatsApp'
 
 /** Splits a line into words (kept together) and characters (animated individually). */
 function SplitLine({ text }: { text: string }) {
@@ -27,7 +29,7 @@ function SplitLine({ text }: { text: string }) {
 }
 
 export function Hero() {
-  const { t, wa, lang } = useI18n()
+  const { t, lang } = useI18n()
   const root = useRef<HTMLElement>(null)
 
   // entrance + scroll-out
@@ -36,20 +38,23 @@ export function Hero() {
     const ctx = gsap.context(() => {
       if (!document.documentElement.classList.contains('is-revealed')) {
         gsap.set('.h-line-in', { yPercent: 118 })
-        gsap.set(['.hero-label', '.hero-side > *', '.hero-foot'], { autoAlpha: 0, y: 22 })
+        // opacity only (never visibility): the buttons stay reachable by keyboard
+        gsap.set(['.hero-label', '.hero-side > *', '.hero-foot'], { opacity: 0, y: 22 })
       }
       const mm = gsap.matchMedia()
       mm.add(MQ.immersive, () => {
         const tl = gsap
           .timeline({ scrollTrigger: { trigger: el, start: 'top top', end: 'bottom top', scrub: true } })
           .to('.hero-title', { yPercent: -38, ease: 'none' }, 0)
-          .to('.hero-title', { autoAlpha: 0, ease: 'power1.in' }, 0.15)
-          .to('.hero-label', { y: -60, autoAlpha: 0, ease: 'none' }, 0)
+          .to('.hero-title', { opacity: 0, ease: 'power1.in' }, 0.15)
+          .to('.hero-label', { y: -60, opacity: 0, ease: 'none' }, 0)
         // whatever would scroll across the 3D tower fades out before it gets there
-        tl.to('.hero-foot', { autoAlpha: 0, duration: 0.08, ease: 'none' }, 0)
-        if (isNarrow()) tl.to('.hero-side', { autoAlpha: 0, duration: 0.09, ease: 'none' }, 0)
-        else tl.to('.hero-side', { y: -90, autoAlpha: 0, ease: 'none' }, 0)
+        tl.to('.hero-foot', { opacity: 0, duration: 0.08, ease: 'none' }, 0)
+        if (isNarrow()) tl.to('.hero-side', { opacity: 0, duration: 0.09, ease: 'none' }, 0)
+        else tl.to('.hero-side', { y: -90, opacity: 0, ease: 'none' }, 0)
       })
+      // the tower starts breaking apart as the visitor leaves the first screen
+      ScrollTrigger.create({ trigger: el, start: 'top top', end: 'bottom top', onUpdate: (s) => (S.explode = s.progress * 0.45) })
     }, el)
 
     const reveal = () =>
@@ -59,9 +64,9 @@ export function Hero() {
           .timeline({ defaults: { ease: 'expo.out' } })
           .to('.h-line-in', { yPercent: 0, duration: reducedMotion ? 0 : 1.5, stagger: 0.11 })
           .fromTo(chars, { '--wd': 62 }, { '--wd': 100, duration: reducedMotion ? 0 : 1.8, stagger: { each: 0.014 }, ease: 'power3.out' }, 0)
-          .to('.hero-label', { autoAlpha: 1, y: 0, duration: 0.9 }, 0.25)
-          .to('.hero-side > *', { autoAlpha: 1, y: 0, duration: 0.9, stagger: 0.08 }, 0.55)
-          .to('.hero-foot', { autoAlpha: 1, y: 0, duration: 0.9 }, 0.9)
+          .to('.hero-label', { opacity: 1, y: 0, duration: 0.9 }, 0.25)
+          .to('.hero-side > *', { opacity: 1, y: 0, duration: 0.9, stagger: 0.08 }, 0.55)
+          .to('.hero-foot', { opacity: 1, y: 0, duration: 0.9 }, 0.9)
       })
     if (document.documentElement.classList.contains('is-revealed')) reveal()
     else window.addEventListener('prospect:reveal', reveal, { once: true })
@@ -89,10 +94,14 @@ export function Hero() {
         // phone: the band between the headline and the supporting text
         S.heroBox = toBox(0, title.bottom - base + 4, vw, side.top - base - 4)
       }
+      // very narrow screens leave little free room: dim the sculpture so the title reads
+      S.faint = vw < 380 ? 1 : 0
     }
     const ro = new ResizeObserver(measure)
     el.querySelectorAll('.hero-title, .hero-side').forEach((n) => ro.observe(n))
     window.addEventListener('resize', measure)
+    // arriving by a deep link, the first measurement happens when the top comes into view
+    window.addEventListener('scroll', measure, { passive: true })
     document.fonts.ready.then(measure)
     // the headline settles (width animation) a moment after the reveal
     const later = [600, 2200, 4200].map((ms) => window.setTimeout(measure, ms))
@@ -101,9 +110,20 @@ export function Hero() {
     return () => {
       ro.disconnect()
       window.removeEventListener('resize', measure)
+      window.removeEventListener('scroll', measure)
       later.forEach(clearTimeout)
     }
   }, [lang])
+
+  // the buttons fade out as the page scrolls: focusing one brings them back into view
+  useEffect(() => {
+    const side = root.current!.querySelector<HTMLElement>('.hero-side')!
+    const onFocus = () => {
+      if (window.scrollY > 24) requestAnimationFrame(() => scrollToY(0, 0, true))
+    }
+    side.addEventListener('focusin', onFocus)
+    return () => side.removeEventListener('focusin', onFocus)
+  }, [])
 
   // characters lean away from the cursor (width + lift), with their own easing
   useEffect(() => {
@@ -212,20 +232,9 @@ export function Hero() {
           {t.hero.sub}
         </p>
         <div className="hero-ctas">
-          <a
-            className="btn btn--solid"
-            href="#showcase"
-            data-magnetic="0.3"
-            onClick={(e) => {
-              e.preventDefault()
-              scrollToSection('showcase')
-            }}
-          >
+          <WaLink placement="hero" label={t.hero.start} magnetic={0.3} />
+          <a className="btn btn--line" {...anchor('work')} data-magnetic="0.3">
             <Roll text={t.hero.explore} />
-          </a>
-          <a className="btn btn--line" href={wa} target="_blank" rel="noopener noreferrer" data-magnetic="0.3">
-            <Roll text={t.hero.start} />
-            <span className="sr-only"> (WhatsApp, {t.external})</span>
           </a>
         </div>
       </div>

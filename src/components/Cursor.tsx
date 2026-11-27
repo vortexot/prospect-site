@@ -3,21 +3,19 @@ import gsap from 'gsap'
 import { finePointer, reducedMotion } from '../core/env'
 
 /**
- * One cohesive cursor: a dot, a lagging ring, a small label that sits beside the
- * pointer (never on top of what it points at), and magnetic pull on [data-magnetic].
- * Desktop pointers only.
+ * A complement to the native cursor, never a replacement: a lagging ring, a small
+ * label that sits beside the pointer (never on top of what it points at), and
+ * magnetic pull on [data-magnetic]. Desktop pointers only.
  *
  * data-cursor values: "link" | "label:Text"
  */
 export function Cursor() {
-  const dot = useRef<HTMLDivElement>(null)
   const ring = useRef<HTMLDivElement>(null)
   const label = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     if (!finePointer) return
     document.documentElement.classList.add('has-cursor')
-    const d = dot.current!
     const r = ring.current!
     const lab = label.current!
     const pos = { x: innerWidth / 2, y: innerHeight / 2 }
@@ -98,7 +96,6 @@ export function Cursor() {
     const tick = () => {
       ringPos.x += (pos.x - ringPos.x) * k
       ringPos.y += (pos.y - ringPos.y) * k
-      d.style.transform = `translate3d(${pos.x}px, ${pos.y}px, 0)`
       r.style.transform = `translate3d(${ringPos.x}px, ${ringPos.y}px, 0)`
     }
     gsap.ticker.add(tick)
@@ -124,7 +121,6 @@ export function Cursor() {
       <div className="cur-ring" ref={ring}>
         <span ref={label} />
       </div>
-      <div className="cur-dot" ref={dot} />
     </div>
   )
 }

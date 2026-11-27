@@ -3,21 +3,33 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { clamp01, easeInOut, finePointer, MQ, reducedMotion, warmImages } from '../core/env'
 import { S } from '../core/sceneState'
-import { scrollToSection, scrollToY } from '../core/scroll'
+import { anchor, scrollToY, setAnchor } from '../core/scroll'
 import { useI18n } from '../i18n'
 import { TRANSITIONS } from '../showcase/transitions'
+import { MOBILE_WORLDS } from '../showcase/MobileWorlds'
 import { WORLDS, WORLD_HEADLINES } from '../showcase/Worlds'
 
 /** progress units: 1 for the frame opening + 7 transitions + a short tail */
 const UNITS = 8.6
 const COUNT = WORLDS.length
+/** scroll distance of one progress unit, in viewport heights */
+const UNIT_VH = 0.62
+/** below this width the concepts use their own mobile compositions */
+const NARROW = '(max-width: 899px)'
 /** progress at which world k is fully on screen and at rest */
 const holdAt = (k: number) => (k === 0 ? 1 : k + 0.9)
 /** progress of transition k (world k → k+1) */
 const tr = (p: number, k: number) => clamp01((p - 1 - k - 0.2) / 0.6)
 
+/** Scrolls only the index row (never the page) so that an entry sits in its middle. */
+function centre(li: HTMLLIElement) {
+  const ol = li.parentElement!
+  if (ol.scrollWidth <= ol.clientWidth) return
+  ol.scrollTo({ left: li.offsetLeft - (ol.clientWidth - li.offsetWidth) / 2, behavior: reducedMotion ? 'instant' : 'smooth' })
+}
+
 export function Showcase() {
-  const { t } = useI18n()
+  const { t, lang } = useI18n()
   const root = useRef<HTMLElement>(null)
   const frame = useRef<HTMLDivElement>(null)
   const tilt = useRef<HTMLDivElement>(null)
@@ -28,6 +40,23 @@ export function Showcase() {
   const [active, setActive] = useState(0)
   const activeRef = useRef(0)
   const goRef = useRef<(k: number) => void>(() => {})
+  const list = useRef<HTMLOListElement>(null)
+  const [narrow, setNarrow] = useState(() => window.matchMedia(NARROW).matches)
+  const worldSet = narrow ? MOBILE_WORLDS : WORLDS
+  const tx = (pt: string, en: string) => (lang === 'en' ? en : pt)
+
+  useEffect(() => {
+    const mq = window.matchMedia(NARROW)
+    const sync = () => setNarrow(mq.matches)
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+
+  // on narrow screens the index is one swipeable row: keep the current entry in view
+  useEffect(() => {
+    const li = marks.current[active]
+    if (li && !list.current!.contains(document.activeElement)) centre(li)
+  }, [active])
 
   // artboard scale: the stage (1440×900, or 1000×1100 on upright phones) fills the frame
   useEffect(() => {
@@ -74,18 +103,23 @@ export function Showcase() {
     }
 
     const mm = gsap.matchMedia()
-    const warm = ScrollTrigger.create({ trigger: el, start: 'top 250%', once: true, onEnter: () => warmImages(el) })
+    // images and concept typefaces are only requested when the section gets close
+    const warm = ScrollTrigger.create({
+      trigger: el,
+      start: 'top 150%',
+      once: true,
+      onEnter: () => {
+        el.classList.add('is-warm')
+        requestAnimationFrame(() => warmImages(el))
+      },
+    })
 
     // ---------- pinned, scroll-scrubbed (desktop and phone) ----------
     mm.add(MQ.immersive, () => {
-      const unit = () => window.innerHeight * 0.62
+      const unit = () => window.innerHeight * UNIT_VH
       const side = el.querySelector<HTMLElement>('.sc-side')!
-      const approach = ScrollTrigger.create({
-        trigger: el,
-        start: 'top bottom',
-        end: 'top top',
-        onUpdate: (s) => (S.explode = s.progress * 0.45),
-      })
+      const box = frame.current!
+      const lean = tilt.current!
       const intro = (p: number) => {
         const e = easeInOut(clamp01((p - 0.12) / 0.88))
         frame.current!.style.transform = `scale(${(0.42 + 0.58 * e).toFixed(4)})`
@@ -114,7 +148,23 @@ export function Showcase() {
       intro(0)
       render(0)
 
-      goRef.current = (k) => scrollToY(pin.start + (holdAt(Math.max(0, Math.min(COUNT - 1, k))) / UNITS) * (pin.end - pin.start), 1.6)
+      /** scroll position where world k is on screen and at rest */
+      const yOf = (k: number) => pin.start + (holdAt(Math.max(0, Math.min(COUNT - 1, k))) / UNITS) * (pin.end - pin.start)
+      goRef.current = (k) => scrollToY(yOf(k), 1.6)
+      // links to #work land where the frame and its index are already visible
+      const removeAnchor = setAnchor('work', () => Math.ceil(yOf(0)))
+
+      // the controls are transparent until the scene opens: focusing one scrolls to it
+      const onFocus = (e: FocusEvent) => {
+        const li = (e.target as HTMLElement).closest('.sc-ind li')
+        const k = li ? marks.current.indexOf(li as HTMLLIElement) : activeRef.current
+        if (li) centre(li as HTMLLIElement)
+        requestAnimationFrame(() => {
+          const visibleFrom = pin.start + (0.97 / UNITS) * (pin.end - pin.start)
+          if (window.scrollY < visibleFrom || window.scrollY > pin.end) scrollToY(yOf(k), 0, true)
+        })
+      }
+      el.addEventListener('focusin', onFocus)
 
       // touch: a sideways swipe on the frame jumps between worlds
       let sx = 0
@@ -139,7 +189,8 @@ export function Showcase() {
       const events = ['wheel', 'keydown', 'pointerdown', 'touchmove'] as const
       events.forEach((ev) => window.addEventListener(ev, touch, { passive: true }))
       const timer = window.setInterval(() => {
-        if (!pin.isActive || busy || document.hidden) return
+        // never move the page under someone who is using the keyboard here
+        if (!pin.isActive || busy || document.hidden || el.querySelector(':focus-visible')) return
         const p = pin.progress * UNITS
         if (p < 0.98 || performance.now() - lastInput < 4600) return
         const next = activeRef.current + 1
@@ -164,15 +215,16 @@ export function Showcase() {
       el.addEventListener('pointermove', onMove)
 
       return () => {
-        approach.kill()
+        removeAnchor()
+        el.removeEventListener('focusin', onFocus)
         pin.kill()
         window.clearInterval(timer)
         events.forEach((ev) => window.removeEventListener(ev, touch))
         el.removeEventListener('pointermove', onMove)
         vp.removeEventListener('pointerdown', down)
         vp.removeEventListener('pointerup', up)
-        ;[frame.current!, side].forEach((n) => n.removeAttribute('style'))
-        gsap.set(tilt.current!, { clearProps: 'all' })
+        ;[box, side].forEach((n) => n.removeAttribute('style'))
+        gsap.set(lean, { clearProps: 'all' })
       }
     })
 
@@ -230,15 +282,8 @@ export function Showcase() {
   const label = `${String(active + 1).padStart(2, '0')} / ${String(COUNT).padStart(2, '0')}`
 
   return (
-    <section className="sc" id="showcase" ref={root} tabIndex={-1} aria-labelledby="sc-title">
-      <a
-        className="skip-link"
-        href="#about"
-        onClick={(e) => {
-          e.preventDefault()
-          scrollToSection('about')
-        }}
-      >
+    <section className="sc" id="work" ref={root} tabIndex={-1} aria-labelledby="sc-title">
+      <a className="skip-link" {...anchor('about')}>
         {t.showcase.skip}
       </a>
       <div className="sc-side">
@@ -246,7 +291,7 @@ export function Showcase() {
           {t.showcase.title}
         </h2>
         <p className="sc-intro">{t.showcase.intro}</p>
-        <ol className="sc-ind">
+        <ol className="sc-ind" ref={list}>
           {t.showcase.niches.map((n, i) => (
             <li key={i} ref={(li) => void (marks.current[i] = li!)} className={i === active ? 'is-active' : ''}>
               <button type="button" aria-current={i === active ? 'true' : undefined} onClick={() => goRef.current(i)}>
@@ -263,14 +308,16 @@ export function Showcase() {
       <div className="sc-frame" ref={frame}>
         <div className="sc-tilt" ref={tilt}>
           <div className="sc-cap" aria-hidden="true">
-            <span>{t.showcase.niches[active]}</span>
+            <span>
+              {t.showcase.concept} · {t.showcase.niches[active]}
+            </span>
             <span>{label}</span>
           </div>
           <div className="sc-viewport" ref={viewport}>
-            <div className="sc-stage" ref={stage} aria-hidden="true">
-              {WORLDS.map((W, i) => (
+            <div className={`sc-stage ${narrow ? 'is-fluid' : ''}`} ref={stage} aria-hidden="true">
+              {worldSet.map((W, i) => (
                 <div className="sc-world" key={i} ref={(d) => void (worlds.current[i] = d!)} style={i ? { visibility: 'hidden' } : undefined}>
-                  <W />
+                  <W tx={tx} />
                 </div>
               ))}
             </div>
@@ -298,7 +345,7 @@ export function Showcase() {
       <ul className="sr-only">
         {t.showcase.niches.map((n, i) => (
           <li key={i}>
-            {n}: {WORLD_HEADLINES[i]}
+            {n}: {WORLD_HEADLINES[lang][i]}
           </li>
         ))}
       </ul>

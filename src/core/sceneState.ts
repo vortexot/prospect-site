@@ -24,6 +24,10 @@ export const S = {
   hovered: -1,
   /** 0..1 fades the whole 3D layer while the showcase frame and its index are read */
   hush: 0,
+  /** 1 on very narrow screens, where the structure is darkened so the headline reads */
+  faint: 0,
+  /** 0..1 darkens the structure while the closing title is over it */
+  cover: 0,
   /**
    * Free screen areas (centre and size as fractions of the viewport) where the structure
    * may be drawn. The DOM measures them so the 3D never sits behind text.
