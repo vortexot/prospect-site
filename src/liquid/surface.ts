@@ -78,6 +78,9 @@ export class Surface {
   private imageTex: WebGLTexture
   private fieldTex: WebGLTexture
   private styleCache: Record<string, string> = {}
+  /** the image's own opacity, and its inline value to restore when we step away */
+  private look = '1'
+  private inlineOpacity = ''
 
   constructor() {
     const gl = this.canvas.getContext('webgl2', { alpha: true, antialias: false, premultipliedAlpha: true, depth: false, stencil: false })
@@ -130,13 +133,15 @@ export class Surface {
     this.img = img
     this.membrane = membrane
     this.styleCache = {}
+    this.look = getComputedStyle(img).opacity
+    this.inlineOpacity = img.style.opacity
 
     gl.activeTexture(gl.TEXTURE0)
     gl.bindTexture(gl.TEXTURE_2D, this.imageTex)
     gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true)
     // upload at the size it is shown (never above 2048) to save memory and avoid shimmer
     const rect = img.getBoundingClientRect()
-    const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
     const natural = { w: img.naturalWidth, h: img.naturalHeight }
     const wanted = Math.min(2048, Math.max(256, Math.ceil(Math.max(rect.width, rect.height) * dpr * 1.25)))
     const down = Math.min(1, wanted / Math.max(natural.w, natural.h))
@@ -158,6 +163,7 @@ export class Surface {
   }
 
   release() {
+    if (this.img) this.img.style.opacity = this.inlineOpacity // the original comes back
     this.canvas.remove()
     this.img = null
     this.membrane = null
@@ -174,6 +180,7 @@ export class Surface {
       height: `${img.offsetHeight}px`,
     }
     for (const key of MIRRORED) style[key] = (cs as unknown as Record<string, string>)[key] ?? ''
+    style.opacity = this.look // not the computed one: the image is hidden while covered
     const target = this.canvas.style as unknown as Record<string, string>
     for (const key in style)
       if (this.styleCache[key] !== style[key]) target[key] = this.styleCache[key] = style[key]
@@ -194,7 +201,7 @@ export class Surface {
 
     // canvas resolution follows the size on screen, not the layout size
     const shown = img.getBoundingClientRect().width || ew
-    const scale = Math.min((shown / ew) * Math.min(window.devicePixelRatio || 1, 1.5), 1600 / Math.max(ew, eh))
+    const scale = Math.min((shown / ew) * Math.min(window.devicePixelRatio || 1, 2), 1600 / Math.max(ew, eh))
     const w = Math.max(2, Math.round(ew * scale))
     const h = Math.max(2, Math.round(eh * scale))
     if (Math.abs(this.canvas.width - w) > 2 || Math.abs(this.canvas.height - h) > 2) {
@@ -231,6 +238,9 @@ export class Surface {
     gl.drawArrays(gl.TRIANGLES, 0, 3)
     // inherit, never force 'visible': that would show through a hidden parent
     this.canvas.style.visibility = ''
+    // the canvas now replaces the picture; leaving it visible would show a still copy behind
+    // any translucent or masked image. opacity (not visibility) keeps it hoverable.
+    if (img.style.opacity !== '0') img.style.opacity = '0'
   }
 
   destroy() {

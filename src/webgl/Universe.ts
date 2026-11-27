@@ -115,6 +115,10 @@ export class Universe {
   private running = false
   private dpr: number
   private maxDpr: number
+  private minDpr: number
+  private slow = false
+  private size = ''
+  private touchNdc = new THREE.Vector2()
   private frameTimes: number[] = []
   private frameNo = 0
   private idleRendered = false
@@ -136,8 +140,11 @@ export class Universe {
     this.opts = opts
     this.n = opts.lowPower ? 13 : 18
     this.height = opts.lowPower ? 4.9 : 5.5
-    this.dpr = Math.min(window.devicePixelRatio || 1, opts.lowPower ? 1.5 : 1.75)
+    // phones have very dense screens: below 1.5x the thin edges visibly pixelate
+    const density = window.devicePixelRatio || 1
+    this.dpr = Math.min(density, opts.lowPower ? 2 : 1.75)
     this.maxDpr = this.dpr
+    this.minDpr = Math.min(density, opts.lowPower ? 1.5 : 1)
 
     // MSAA everywhere: thin chrome edges and lines alias badly without it
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false, powerPreference: 'high-performance' })
@@ -362,27 +369,25 @@ export class Universe {
     this.pointerMoved = true
   }
 
+  /** A finger only stirs the dust. Camera and tower stay put, so scrolling never shakes them. */
   private onTouch = (e: TouchEvent) => {
     const t = e.touches[0]
     if (!t) return
     this.touching = true
-    S.px = (t.clientX / window.innerWidth) * 2 - 1
-    S.py = -(t.clientY / window.innerHeight) * 2 + 1
+    this.touchNdc.set((t.clientX / window.innerWidth) * 2 - 1, -(t.clientY / window.innerHeight) * 2 + 1)
     this.pMat.uniforms.uMouseForce.value = 1
-    this.pointerMoved = true
   }
 
-  /** finger lifted: the camera eases back to centre */
   private onTouchEnd = () => {
     this.touching = false
-    S.px = 0
-    S.py = 0
     this.pMat.uniforms.uMouseForce.value = 0
   }
 
   private resize = () => {
     const w = this.canvas.clientWidth || window.innerWidth
     const h = this.canvas.clientHeight || window.innerHeight
+    if (`${w}x${h}` === this.size) return
+    this.size = `${w}x${h}`
     this.renderer.setSize(w, h, false)
     this.camera.aspect = w / h
     this.camera.updateProjectionMatrix()
@@ -451,7 +456,7 @@ export class Universe {
   // ---------------- frame loop ----------------
   private tick = () => {
     this.frameNo++
-    const halfRate = S.dim > 0.6
+    const halfRate = S.dim > 0.6 || this.slow
     // reading sections only show slow debris: 30 fps is enough there
     if (halfRate && this.frameNo % 2) return
     // after the final collapse there is nothing left to draw
@@ -572,7 +577,8 @@ export class Universe {
 
     // particles
     if ((this.opts.pointer || this.touching) && !reduced) {
-      this.ndc.set(S.px, S.py)
+      if (this.touching) this.ndc.copy(this.touchNdc)
+      else this.ndc.set(S.px, S.py)
       this.raycaster.setFromCamera(this.ndc, this.camera)
       if (this.raycaster.ray.intersectPlane(this.plane, this.mouseTarget)) this.mouseWorld.lerp(this.mouseTarget, easeK(0.12))
     }
@@ -630,10 +636,13 @@ export class Universe {
   private fit(box: Box, z: number) {
     const visH = 2 * z * Math.tan(THREE.MathUtils.degToRad(this.camera.fov / 2))
     const visW = visH * this.camera.aspect
+    // portrait screens let the tips reach the edges of the box, so it reads big
+    const portrait = this.camera.aspect < 1
+    const [wide, tall, max] = portrait ? [3.95, 6.35, 1.35] : [4.6, 7.1, 1.15]
     return {
       x: (box.x - 0.5) * visW,
       y: 0.1 + (0.5 - box.y) * visH,
-      s: Math.max(0.2, Math.min(1.15, (box.w * visW) / 4.6, (box.h * visH) / 7.1)),
+      s: Math.max(0.2, Math.min(max, (box.w * visW) / wide, (box.h * visH) / tall)),
     }
   }
 
@@ -650,7 +659,7 @@ export class Universe {
   /**
    * Adaptive resolution. Uses the median of ~2 s of visible frames, so a hidden tab,
    * a background pane or a single hitch never lowers quality. Steps down on slow
-   * machines (never below 0.85) and back up once there is headroom again.
+   * machines (never into visible pixels) and back up once there is headroom again.
    */
   private adapt(raw: number) {
     if (document.hidden || raw > 0.2) {
@@ -664,9 +673,11 @@ export class Universe {
     this.frameTimes.length = 0
     const pr = this.renderer.getPixelRatio()
     let next = pr
-    if (median > 0.026 && pr > 0.85) {
-      next = Math.max(0.85, pr - 0.25)
-      this.downgraded = true
+    if (median > 0.026) {
+      if (pr > this.minDpr) {
+        next = Math.max(this.minDpr, pr - 0.25)
+        this.downgraded = true
+      } else this.slow = true // keep it sharp, draw every other frame
     } else if (median < 0.0175 && pr < this.maxDpr && !this.downgraded) next = Math.min(this.maxDpr, pr + 0.25)
     if (next !== pr) {
       this.renderer.setPixelRatio(next)

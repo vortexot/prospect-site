@@ -37,6 +37,6 @@ export type Box = { x: number; y: number; w: number; h: number }
 /** Builds a Box from pixel edges inside the viewport. */
 export function toBox(left: number, top: number, right: number, bottom: number): Box {
   const vw = window.innerWidth
-  const vh = window.innerHeight
+  const vh = document.querySelector<HTMLElement>('.gl')?.clientHeight || window.innerHeight
   return { x: (left + right) / 2 / vw, y: (top + bottom) / 2 / vh, w: Math.max(0, right - left) / vw, h: Math.max(0, bottom - top) / vh }
 }
