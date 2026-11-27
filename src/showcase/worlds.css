@@ -1002,344 +1002,234 @@
 }
 
 /* ================================================================
-   Upright artboards (1000 × 1100) for phones: each concept is
-   recomposed for a tall frame, with larger type.
+   Narrow screens (< 900 px): each concept has its own composition,
+   drawn at real size. Type scales with the frame and never drops
+   below 12 px.
    ================================================================ */
-@media (max-width: 899px) and (orientation: portrait) and (prefers-reduced-motion: no-preference) {
-  .world .w-nav {
-    top: 38px;
-    left: 48px;
-    right: 48px;
+.mw {
+  container-type: size;
+  display: flex;
+  flex-direction: column;
+}
+.mw-logo {
+  flex: none;
+  padding: 5cqh 6cqw 3cqh;
+  font-size: clamp(0.875rem, 5.5cqmin, 2.4rem);
+  line-height: 1.1;
+}
+.mw-media {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.world .mw-media img {
+  position: absolute;
+  inset: 0;
+}
+.mw-body {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 3cqh;
+  padding: 4cqh 6cqw 5cqh;
+}
+.mw-title {
+  font-size: clamp(1.25rem, 9.5cqmin, 4.5rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+.mw-cta {
+  padding: 0.75em 1.2em;
+  background: #fff;
+  color: #0a0a0a;
+  font-size: clamp(0.75rem, 3.6cqmin, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* 01 architecture: light paper, condensed capitals */
+.mw-arch {
+  background: #d9d9d9;
+  color: #0b0b0b;
+}
+.mw-arch .mw-logo,
+.mw-arch .mw-title {
+  font-family: 'Big Shoulders Display', sans-serif;
+  font-weight: 800;
+}
+.mw-arch .mw-title {
+  font-size: clamp(1.5rem, 12.5cqmin, 6rem);
+  line-height: 0.92;
+  text-transform: uppercase;
+}
+.mw-arch .mw-cta {
+  background: #0b0b0b;
+  color: #fff;
+}
+
+/* 02 real estate: words first, photograph below */
+.mw-estate {
+  background: #f2f2f2;
+  color: #0b0b0b;
+}
+.mw-estate .mw-logo,
+.mw-estate .mw-title {
+  font-family: 'Italiana', serif;
+  font-weight: 400;
+}
+.mw-estate .mw-media {
+  order: 2;
+}
+.mw-estate .mw-body {
+  padding-top: 1cqh;
+}
+.mw-estate .mw-cta {
+  background: #0b0b0b;
+  color: #fff;
+}
+
+/* 03 barbershop: photograph fading into black, tall capitals */
+.mw-barber {
+  background: #0a0a0a;
+}
+.mw-barber .mw-logo,
+.mw-barber .mw-title {
+  font-family: 'Anton', sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+}
+.mw-barber .mw-title {
+  font-size: clamp(1.5rem, 12cqmin, 6rem);
+  text-transform: uppercase;
+}
+.mw-barber .mw-media {
+  -webkit-mask-image: linear-gradient(to bottom, #000 62%, transparent);
+  mask-image: linear-gradient(to bottom, #000 62%, transparent);
+}
+
+/* 04 restaurant: a round plate, centred italics */
+.mw-food {
+  align-items: center;
+  background: radial-gradient(circle at 50% 42%, #1d1d1d 0, #050505 62%);
+  text-align: center;
+}
+.mw-food .mw-logo,
+.mw-food .mw-title {
+  font-family: 'Bodoni Moda', serif;
+  font-style: italic;
+  font-weight: 400;
+}
+.mw-food .mw-media {
+  flex: 0 1 auto;
+  width: min(74cqw, 52cqh);
+  aspect-ratio: 1;
+  margin: auto;
+  border-radius: 50%;
+  overflow: hidden;
+}
+.mw-food .mw-media {
+  height: min(74cqw, 52cqh);
+}
+.world.mw-food .mw-media img {
+  transform: scale(1.3);
+}
+.mw-food .mw-body {
+  align-items: center;
+}
+
+/* 05 clinic: soft light, an arched portrait */
+.mw-clinic {
+  background: #ececec;
+  color: #141414;
+  text-align: center;
+}
+.mw-clinic .mw-logo,
+.mw-clinic .mw-title {
+  font-family: 'Tenor Sans', sans-serif;
+  font-weight: 400;
+}
+.mw-clinic .mw-media {
+  margin: 0 14cqw;
+  border-radius: 50cqw 50cqw 0 0;
+  overflow: hidden;
+}
+.mw-clinic .mw-body {
+  align-items: center;
+}
+.mw-clinic .mw-cta {
+  border-radius: 40px;
+  background: #141414;
+  color: #fff;
+}
+
+/* 06 fitness: cut photograph, heavy italics */
+.mw-fit .mw-logo,
+.mw-fit .mw-title {
+  font-weight: 900;
+  font-stretch: 70%;
+  font-style: italic;
+  text-transform: uppercase;
+}
+.mw-fit .mw-title {
+  font-size: clamp(1.5rem, 13cqmin, 6.5rem);
+  line-height: 0.92;
+}
+.mw-fit .mw-media {
+  clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
+}
+
+/* 07 automotive: wide capitals over a dark studio */
+.mw-auto {
+  background: radial-gradient(ellipse at 50% 60%, #202020 0, #070707 55%, #000 100%);
+}
+.mw-auto .mw-logo,
+.mw-auto .mw-title {
+  font-family: 'Michroma', sans-serif;
+  font-weight: 400;
+}
+.mw-auto .mw-title {
+  order: 0;
+  font-size: clamp(1.125rem, 6.5cqmin, 3rem);
+  line-height: 1.3;
+}
+.world.mw-auto .mw-media img {
+  object-fit: contain;
+}
+
+/* 08 fashion: editorial serif */
+.mw-fashion .mw-logo,
+.mw-fashion .mw-title {
+  font-family: 'Instrument Serif', serif;
+  font-weight: 400;
+}
+.mw-fashion .mw-title {
+  font-size: clamp(1.5rem, 13cqmin, 6.5rem);
+  line-height: 0.94;
+}
+.mw-fashion .mw-media {
+  margin: 0 6cqw;
+}
+
+/* a landscape frame (phone on its side): photograph on the right, words on the left */
+@container (min-aspect-ratio: 5 / 4) {
+  .mw-logo {
+    position: relative;
+    z-index: 1;
+    width: 50%;
+  }
+  .mw .mw-media {
+    position: absolute;
+    inset: 0 0 0 52%;
     width: auto;
-  }
-  .world .w-nav nav {
-    display: none;
-  }
-
-  /* 01 architecture */
-  .w-arch .wa-logo {
-    font-size: 50px;
-  }
-  .w-arch .wa-logo small {
-    font-size: 17px;
-  }
-  .w-arch .wa-quote {
-    font-size: 20px;
-  }
-  .w-arch .wa-grid,
-  .w-arch .wa-spec,
-  .w-arch .wa-side p {
-    display: none;
-  }
-  .w-arch .wa-bg {
-    left: 0;
-    top: 150px;
-    width: 1000px;
-    height: 500px;
-  }
-  .w-arch .wa-title {
-    left: 48px;
-    top: 692px;
-    font-size: 128px;
-  }
-  .w-arch .wa-side {
-    left: auto;
-    right: 48px;
-    bottom: 60px;
-    width: auto;
-  }
-  .w-arch .wa-btn {
-    font-size: 22px;
-    padding: 24px 36px;
-  }
-
-  /* 02 real estate */
-  .w-estate .we-media {
-    left: 0;
-    top: 510px;
-  }
-  .w-estate .we-panel {
-    width: 1000px;
-    height: 510px;
-    padding: 0 48px;
-  }
-  .w-estate .we-panel .w-nav {
-    width: 904px;
-  }
-  .w-estate .we-logo {
-    font-size: 52px;
-  }
-  .w-estate .we-logo small {
-    font-size: 17px;
-  }
-  .w-estate .we-title {
-    margin-top: 160px;
-    font-size: 114px;
-  }
-  .w-estate .we-sub {
-    width: 860px;
-    margin-top: 22px;
-    font-size: 28px;
-    line-height: 1.45;
-  }
-  .w-estate .we-card {
-    display: none;
-  }
-  .w-estate .we-search {
-    left: 48px;
-    bottom: 48px;
-    width: 904px;
-    height: 124px;
-    grid-template-columns: 1.4fr 0.8fr auto;
-    font-size: 28px;
-  }
-  .w-estate .we-search div {
-    font-size: 28px;
-  }
-  .w-estate .we-search div:nth-child(3) {
-    display: none;
-  }
-  .w-estate .we-search small {
-    font-size: 15px;
-  }
-  .w-estate .we-go {
-    font-size: 20px;
-  }
-
-  /* 03 barbershop */
-  .w-barber .wb-img {
-    width: 1000px;
-    height: 640px;
-    -webkit-mask-image: linear-gradient(to bottom, #000 68%, transparent);
-    mask-image: linear-gradient(to bottom, #000 68%, transparent);
-  }
-  .w-barber .wb-logo {
-    font-size: 56px;
-  }
-  .w-barber .wb-book {
-    font-size: 21px;
-    padding: 20px 34px;
-  }
-  .w-barber .wb-title {
-    left: 48px;
-    top: 590px;
-    font-size: 200px;
-  }
-  .w-barber .wb-sub {
-    left: 54px;
-    top: 962px;
-    font-size: 82px;
-  }
-  .w-barber .wb-agenda,
-  .w-barber .wb-meta {
-    display: none;
-  }
-
-  /* 04 restaurant */
-  .w-food {
-    background: radial-gradient(circle at 50% 40%, #1d1d1d 0, #050505 52%);
-  }
-  .w-food .w-nav {
-    justify-content: space-between;
-  }
-  .w-food .w-nav > span:not(.wf-res) {
-    display: none;
-  }
-  .w-food .wf-logo {
+    height: auto;
     margin: 0;
-    font-size: 66px;
+    aspect-ratio: auto;
+    border-radius: 0;
   }
-  .w-food .wf-res {
-    position: static;
-    font-size: 21px;
-    padding: 18px 30px;
-  }
-  .w-food .wf-plate {
-    left: 215px;
-    top: 160px;
-    width: 570px;
-    height: 570px;
-  }
-  .w-food .wf-t1,
-  .w-food .wf-t2 {
-    left: 0;
-    right: 0;
-    font-size: 108px;
-    text-align: center;
-  }
-  .w-food .wf-t1 {
-    top: 760px;
-  }
-  .w-food .wf-t2 {
-    top: 872px;
-  }
-  .w-food .wf-menu,
-  .w-food .wf-book {
-    display: none;
-  }
-
-  /* 05 clinic */
-  .w-clinic .wc-logo {
-    font-size: 56px;
-  }
-  .w-clinic .wc-logo small {
-    font-size: 17px;
-  }
-  .w-clinic .wc-s {
-    font-size: 24px;
-    padding: 18px 40px;
-  }
-  .w-clinic .wc-title {
-    left: 48px;
-    top: 168px;
-    width: 900px;
-    font-size: 98px;
-  }
-  .w-clinic .wc-sub,
-  .w-clinic .wc-form,
-  .w-clinic .wc-list {
-    display: none;
-  }
-  .w-clinic .wc-arch {
-    left: 48px;
-    right: auto;
-    top: 520px;
-    width: 566px;
-    height: 580px;
-    border-radius: 283px 283px 0 0;
-  }
-  .w-clinic .wc-thumb {
-    right: 48px;
-    bottom: 0;
-    width: 304px;
-    height: 430px;
-    border-radius: 152px 152px 0 0;
-  }
-
-  /* 06 fitness */
-  .w-fit .wfi-img {
-    width: 1000px;
-    bottom: auto;
-    height: 650px;
-    clip-path: none;
-    -webkit-mask-image: linear-gradient(to bottom, #000 66%, transparent);
-    mask-image: linear-gradient(to bottom, #000 66%, transparent);
-  }
-  .w-fit .wfi-logo {
-    font-size: 56px;
-  }
-  .w-fit .wfi-s {
-    font-size: 21px;
-    padding: 20px 34px;
-  }
-  .w-fit .wfi-title {
-    left: 44px;
-    top: 592px;
-    font-size: 205px;
-  }
-  .w-fit .wfi-title span:nth-child(2) {
-    padding-left: 150px;
-  }
-  .w-fit .wfi-sub,
-  .w-fit .wfi-sched {
-    display: none;
-  }
-
-  /* 07 automotive */
-  .w-auto .wau-logo {
-    font-size: 36px;
-  }
-  .w-auto .wau-s {
-    font-size: 19px;
-    padding: 18px 28px;
-  }
-  .w-auto .wau-title {
-    top: 170px;
-    font-size: 64px;
-  }
-  .w-auto .wau-car {
-    left: -170px;
-    right: -170px;
-    top: 350px;
-    height: 500px;
-  }
-  .w-auto .wau-specs {
-    left: 48px;
-    right: 48px;
-    bottom: 150px;
-    justify-content: space-between;
-    gap: 0;
-  }
-  .w-auto .wau-specs b {
-    font-size: 40px;
-  }
-  .w-auto .wau-specs span {
-    font-size: 18px;
-  }
-  .w-auto .wau-foot {
-    left: 48px;
-    right: 48px;
-    bottom: 38px;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .w-auto .wau-model {
-    font-size: 22px;
-  }
-  .w-auto .wau-cta {
-    font-size: 20px;
-    padding: 24px 30px;
-  }
-
-  /* 08 fashion */
-  .w-fashion .wfa-logo {
-    font-size: 62px;
-  }
-  .w-fashion .w-nav > span {
-    font-size: 26px;
-  }
-  .w-fashion .wfa-main {
-    left: 48px;
-    top: 140px;
-    bottom: auto;
-    width: 570px;
-    height: 630px;
-  }
-  .w-fashion .wfa-side {
-    right: 48px;
-    top: 140px;
-    width: 304px;
-  }
-  .w-fashion .wfa-side img {
-    height: 370px;
-  }
-  .w-fashion .wfa-prod {
-    flex-direction: column;
-    font-size: 24px;
-  }
-  .w-fashion .wfa-title {
-    left: 48px;
-    top: 834px;
-    font-size: 146px;
-    line-height: 0.88;
-  }
-  .w-fashion .wfa-coll {
-    left: 650px;
-    top: 618px;
-    bottom: auto;
-  }
-  .w-fashion .wfa-coll small {
-    font-size: 17px;
-  }
-  .w-fashion .wfa-coll span:not(.wfa-cta) {
-    font-size: 62px;
-  }
-  .w-fashion .wfa-cta {
-    font-size: 19px;
-    padding: 20px 28px;
-  }
-  .w-fashion .wfa-issue {
-    display: none;
+  .mw .mw-body {
+    width: 52%;
+    margin-top: auto;
   }
 }

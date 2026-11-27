@@ -1,11 +1,14 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
+import { Pending } from '../components/Pending'
+import { CONTENT } from '../content'
 import { MQ } from '../core/env'
 import { useI18n } from '../i18n'
 
 /** Manifesto: words light up as the reader scrolls through them. */
 export function About() {
   const { t, lang } = useI18n()
+  const { team } = CONTENT
   const root = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -14,7 +17,8 @@ export function About() {
     const light = (start: string, end: string, stagger: number) =>
       gsap.fromTo(
         el.querySelectorAll('.ab-w'),
-        { opacity: 0.14 },
+        // unread words stay above 4.5:1 contrast
+        { opacity: 0.52 },
         { opacity: 1, ease: 'none', stagger, scrollTrigger: { trigger: el.querySelector('.ab-text'), start, end, scrub: true } },
       )
     mm.add(MQ.immersive, () => void light('top 78%', 'bottom 52%', 0.1))
@@ -33,6 +37,23 @@ export function About() {
           </span>
         ))}
       </p>
+      <div className="ab-team">
+        {team.length > 0 ? (
+          <>
+            <h3>{t.about.team}</h3>
+            <ul>
+              {team.map((p) => (
+                <li key={p.name}>
+                  <strong>{p.name}</strong>
+                  <span>{p.role[lang]}</span>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : (
+          <Pending what={t.pending.team} />
+        )}
+      </div>
     </section>
   )
 }

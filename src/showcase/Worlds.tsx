@@ -1,13 +1,4 @@
-import '@fontsource/big-shoulders-display/latin-800'
-import '@fontsource/big-shoulders-display/latin-500'
-import '@fontsource/italiana/latin-400'
-import '@fontsource/anton/latin-400'
-import '@fontsource/bodoni-moda/latin-400'
-import '@fontsource/bodoni-moda/latin-400-italic'
-import '@fontsource/tenor-sans/latin-400'
-import '@fontsource/michroma/latin-400'
-import '@fontsource/instrument-serif/latin-400'
-import '@fontsource/instrument-serif/latin-400-italic'
+import './fonts.css'
 import './worlds.css'
 
 /**
@@ -15,7 +6,10 @@ import './worlds.css'
  * 1440×900 artboard and scaled to the showcase frame, like a real browser viewport.
  */
 
-function Img({ n, sizes = '1000px', eager = false, className }: { n: string; sizes?: string; eager?: boolean; className?: string }) {
+/** Every visible string of a concept, in the page's language. */
+export type Tx = (pt: string, en: string) => string
+
+export function Img({ n, sizes = '1000px', className }: { n: string; sizes?: string; className?: string }) {
   return (
     <img
       className={className}
@@ -23,7 +17,7 @@ function Img({ n, sizes = '1000px', eager = false, className }: { n: string; siz
       srcSet={`/showcase/${n}-sm.webp 800w, /showcase/${n}.webp 1600w`}
       sizes={sizes}
       alt=""
-      loading={eager ? 'eager' : 'lazy'}
+      loading="lazy"
       decoding="async"
       draggable={false}
       data-liquid=""
@@ -31,9 +25,9 @@ function Img({ n, sizes = '1000px', eager = false, className }: { n: string; siz
   )
 }
 
-const Arch = () => (
+const Arch = ({ tx }: { tx: Tx }) => (
   <div className="world w-arch">
-    <Img n="arch-1" eager className="wa-bg" sizes="(max-width: 899px) 100vw, 1100px" />
+    <Img n="arch-1" className="wa-bg" sizes="(max-width: 899px) 100vw, 1100px" />
     <div className="wa-grid">
       {Array.from({ length: 12 }, (_, i) => (
         <i key={i} />
@@ -41,45 +35,45 @@ const Arch = () => (
     </div>
     <header className="w-nav">
       <b className="wa-logo">
-        MONOLITO<small>arquitetura &amp; construção</small>
+        MONOLITO<small>{tx('arquitetura & construção', 'architecture & construction')}</small>
       </b>
       <nav>
-        <span>Projetos</span>
-        <span>Escritório</span>
-        <span>Obras</span>
-        <span>Contato</span>
+        <span>{tx('Projetos', 'Projects')}</span>
+        <span>{tx('Escritório', 'Studio')}</span>
+        <span>{tx('Obras', 'Sites')}</span>
+        <span>{tx('Contato', 'Contact')}</span>
       </nav>
-      <span className="wa-quote">Solicitar orçamento</span>
+      <span className="wa-quote">{tx('Solicitar orçamento', 'Request a quote')}</span>
     </header>
     <div className="wa-title r1">
-      Construindo
+      {tx('Construindo', 'Building')}
       <br />
-      um futuro
+      {tx('um futuro', 'a better')}
       <br />
-      melhor.
+      {tx('melhor.', 'future.')}
     </div>
     <div className="wa-side r2">
-      <p>Projetos residenciais e corporativos com rigor técnico, do primeiro traço à entrega das chaves.</p>
-      <span className="wa-btn">Ver projetos</span>
+      <p>{tx('Projetos residenciais e corporativos com rigor técnico, do primeiro traço à entrega das chaves.', 'Residential and corporate projects with technical rigour, from the first sketch to handing over the keys.')}</p>
+      <span className="wa-btn">{tx('Ver projetos', 'View projects')}</span>
     </div>
     <dl className="wa-spec r3">
       <div>
-        <dt>Projeto</dt>
-        <dd>Pavilhão Duna</dd>
+        <dt>{tx('Projeto', 'Project')}</dt>
+        <dd>{tx('Pavilhão Duna', 'Dune Pavilion')}</dd>
       </div>
       <div>
-        <dt>Área</dt>
-        <dd>12.400 m²</dd>
+        <dt>{tx('Área', 'Area')}</dt>
+        <dd>{tx('12.400 m²', '12,400 m²')}</dd>
       </div>
       <div>
-        <dt>Entrega</dt>
+        <dt>{tx('Entrega', 'Handover')}</dt>
         <dd>2025</dd>
       </div>
     </dl>
   </div>
 )
 
-const Estate = () => (
+const Estate = ({ tx }: { tx: Tx }) => (
   <div className="world w-estate">
     <div className="we-media">
       <Img n="estate-2" sizes="(max-width: 899px) 70vw, 760px" />
@@ -87,133 +81,134 @@ const Estate = () => (
     <div className="we-panel">
       <header className="w-nav">
         <b className="we-logo">
-          Altavista<small>Residências</small>
+          Altavista<small>{tx('Residências', 'Residences')}</small>
         </b>
         <nav>
-          <span>Comprar</span>
-          <span>Lançamentos</span>
-          <span>Sobre</span>
+          <span>{tx('Comprar', 'Buy')}</span>
+          <span>{tx('Lançamentos', 'New homes')}</span>
+          <span>{tx('Sobre', 'About')}</span>
         </nav>
       </header>
       <div className="we-title r1">
-        Viva o<br />
-        extraordinário.
+        {tx('Viva o', 'Live the')}
+        <br />
+        {tx('extraordinário.', 'extraordinary.')}
       </div>
-      <p className="we-sub r2">Residências de alto padrão selecionadas uma a uma, com atendimento reservado do primeiro contato às chaves.</p>
+      <p className="we-sub r2">{tx('Residências de alto padrão selecionadas uma a uma, com atendimento reservado do primeiro contato às chaves.', 'High-end homes selected one by one, with private service from the first contact to the keys.')}</p>
     </div>
     <div className="we-card r3">
       <Img n="estate-1" sizes="260px" />
       <div>
-        <small>Destaque</small>
-        <b>Casa Horizonte</b>
-        <span>4 suítes · 620 m²</span>
+        <small>{tx('Destaque', 'Featured')}</small>
+        <b>{tx('Casa Horizonte', 'Horizon House')}</b>
+        <span>{tx('4 suítes · 620 m²', '4 suites · 620 m²')}</span>
       </div>
     </div>
     <div className="we-search r2">
       <div>
-        <small>Localização</small>
+        <small>{tx('Localização', 'Location')}</small>
         <span>Lago Sul, Brasília</span>
       </div>
       <div>
-        <small>Tipo</small>
-        <span>Casa</span>
+        <small>{tx('Tipo', 'Type')}</small>
+        <span>{tx('Casa', 'House')}</span>
       </div>
       <div>
-        <small>Investimento</small>
-        <span>Acima de R$ 5 mi</span>
+        <small>{tx('Investimento', 'Budget')}</small>
+        <span>{tx('Acima de R$ 5 mi', 'Above R$ 5M')}</span>
       </div>
-      <span className="we-go">Buscar imóveis</span>
+      <span className="we-go">{tx('Buscar imóveis', 'Search homes')}</span>
     </div>
   </div>
 )
 
-const Barber = () => (
+const Barber = ({ tx }: { tx: Tx }) => (
   <div className="world w-barber">
     <Img n="barber-1" className="wb-img" sizes="(max-width: 899px) 70vw, 900px" />
     <header className="w-nav">
       <b className="wb-logo">OFÍCIO</b>
       <nav>
-        <span>Serviços</span>
-        <span>Barbeiros</span>
-        <span>Loja</span>
+        <span>{tx('Serviços', 'Services')}</span>
+        <span>{tx('Barbeiros', 'Barbers')}</span>
+        <span>{tx('Loja', 'Shop')}</span>
       </nav>
-      <span className="wb-book">Agendar</span>
+      <span className="wb-book">{tx('Agendar', 'Book')}</span>
     </header>
     <div className="wb-title r1">
-      <span>Mais que</span>
-      <span>um corte.</span>
+      <span>{tx('Mais que', 'More than')}</span>
+      <span>{tx('um corte.', 'a haircut.')}</span>
     </div>
-    <div className="wb-sub r2">Um estilo de vida.</div>
+    <div className="wb-sub r2">{tx('Um estilo de vida.', 'A way of life.')}</div>
     <div className="wb-agenda r3">
-      <small>Horários de hoje</small>
+      <small>{tx('Horários de hoje', 'Today\'s slots')}</small>
       <div className="wb-slots">
         <span>14:30</span>
         <span className="on">15:15</span>
         <span>16:00</span>
         <span>17:45</span>
       </div>
-      <span className="wb-cta">Agendar horário</span>
+      <span className="wb-cta">{tx('Agendar horário', 'Book a time')}</span>
     </div>
-    <div className="wb-meta">Corte + barba — 60 min</div>
+    <div className="wb-meta">{tx('Corte + barba — 60 min', 'Cut + beard — 60 min')}</div>
   </div>
 )
 
-const Food = () => (
+const Food = ({ tx }: { tx: Tx }) => (
   <div className="world w-food">
     <header className="w-nav">
       <span>Menu</span>
-      <span>Adega</span>
+      <span>{tx('Adega', 'Cellar')}</span>
       <b className="wf-logo">Éter</b>
-      <span>História</span>
-      <span className="wf-res">Reservar</span>
+      <span>{tx('História', 'Story')}</span>
+      <span className="wf-res">{tx('Reservar', 'Reserve')}</span>
     </header>
     <div className="wf-plate">
       <Img n="food-1" sizes="(max-width: 899px) 50vw, 600px" />
     </div>
-    <div className="wf-t1 r1">Uma experiência</div>
-    <div className="wf-t2 r1">além do paladar.</div>
+    <div className="wf-t1 r1">{tx('Uma experiência', 'An experience')}</div>
+    <div className="wf-t2 r1">{tx('além do paladar.', 'beyond taste.')}</div>
     <div className="wf-menu r2">
-      <small>Menu degustação</small>
+      <small>{tx('Menu degustação', 'Tasting menu')}</small>
       <ol>
-        <li>Pão de fermentação natural</li>
-        <li>Peixe curado, cítricos</li>
-        <li>Cordeiro, terra e brasa</li>
+        <li>{tx('Pão de fermentação natural', 'Sourdough bread')}</li>
+        <li>{tx('Peixe curado, cítricos', 'Cured fish, citrus')}</li>
+        <li>{tx('Cordeiro, terra e brasa', 'Lamb, earth and ember')}</li>
       </ol>
-      <span>7 tempos, harmonização opcional</span>
+      <span>{tx('7 tempos, harmonização opcional', '7 courses, optional pairing')}</span>
     </div>
     <div className="wf-book r3">
-      <span>Sexta, 20:30</span>
-      <span>2 pessoas</span>
-      <span className="wf-cta">Reservar mesa</span>
+      <span>{tx('Sexta, 20:30', 'Friday, 8:30 pm')}</span>
+      <span>{tx('2 pessoas', '2 guests')}</span>
+      <span className="wf-cta">{tx('Reservar mesa', 'Book a table')}</span>
     </div>
   </div>
 )
 
-const Clinic = () => (
+const Clinic = ({ tx }: { tx: Tx }) => (
   <div className="world w-clinic">
     <header className="w-nav">
       <b className="wc-logo">
-        luma<small>estética avançada</small>
+        luma<small>{tx('estética avançada', 'advanced aesthetics')}</small>
       </b>
       <nav>
-        <span>Tratamentos</span>
-        <span>Equipe</span>
-        <span>A clínica</span>
+        <span>{tx('Tratamentos', 'Treatments')}</span>
+        <span>{tx('Equipe', 'Team')}</span>
+        <span>{tx('A clínica', 'The clinic')}</span>
       </nav>
-      <span className="wc-s">Agendar</span>
+      <span className="wc-s">{tx('Agendar', 'Book')}</span>
     </header>
-    <div className="wc-title r1">Realce o que há de melhor em você.</div>
-    <p className="wc-sub r2">Protocolos personalizados de estética facial e corporal, conduzidos por especialistas.</p>
+    <div className="wc-title r1">{tx('Realce o que há de melhor em você.', 'Bring out the best in you.')}</div>
+    <p className="wc-sub r2">{tx('Protocolos personalizados de estética facial e corporal, conduzidos por especialistas.', 'Personalised face and body protocols, led by specialists.')}</p>
     <div className="wc-form r3">
       <div>
-        <small>Tratamento</small>
-        <span>Bioestimulador</span>
+        <small>{tx('Tratamento', 'Treatment')}</small>
+        <span>{tx('Bioestimulador', 'Biostimulator')}</span>
       </div>
       <div>
-        <small>Data</small>
-        <span>12 de março</span>
+        <small>{tx('Data', 'Date')}</small>
+        <span>{tx('12 de março', 'March 12')}</span>
       </div>
-      <span className="wc-go">Agendar avaliação</span>
+      <span className="wc-go">{tx('Agendar avaliação', 'Book a consultation')}</span>
     </div>
     <div className="wc-arch">
       <Img n="clinic-1" sizes="(max-width: 899px) 40vw, 520px" />
@@ -222,14 +217,14 @@ const Clinic = () => (
       <Img n="clinic-2" sizes="240px" />
     </div>
     <ul className="wc-list">
-      <li>Facial</li>
-      <li>Corporal</li>
+      <li>{tx('Facial', 'Face')}</li>
+      <li>{tx('Corporal', 'Body')}</li>
       <li>Laser</li>
     </ul>
   </div>
 )
 
-const Fitness = () => (
+const Fitness = ({ tx }: { tx: Tx }) => (
   <div className="world w-fit">
     <div className="wfi-img">
       <Img n="fitness-2" sizes="(max-width: 899px) 80vw, 1000px" />
@@ -237,23 +232,23 @@ const Fitness = () => (
     <header className="w-nav">
       <b className="wfi-logo">FORJA</b>
       <nav>
-        <span>Modalidades</span>
-        <span>Planos</span>
-        <span>Unidades</span>
+        <span>{tx('Modalidades', 'Classes')}</span>
+        <span>{tx('Planos', 'Plans')}</span>
+        <span>{tx('Unidades', 'Locations')}</span>
       </nav>
-      <span className="wfi-s">Matricule-se</span>
+      <span className="wfi-s">{tx('Matricule-se', 'Join now')}</span>
     </header>
     <div className="wfi-title r1">
-      <span>Supere</span>
-      <span>seus</span>
-      <span>limites.</span>
+      <span>{tx('Supere', 'Push')}</span>
+      <span>{tx('seus', 'your')}</span>
+      <span>{tx('limites.', 'limits.')}</span>
     </div>
-    <p className="wfi-sub r2">Força e condicionamento com acompanhamento de perto, do primeiro treino ao seu melhor tempo.</p>
+    <p className="wfi-sub r2">{tx('Força e condicionamento com acompanhamento de perto, do primeiro treino ao seu melhor tempo.', 'Strength and conditioning with close coaching, from the first session to your best time.')}</p>
     <div className="wfi-sched r3">
-      <small>Hoje</small>
+      <small>{tx('Hoje', 'Today')}</small>
       <div>
         <b>06:00</b>
-        <span>Força</span>
+        <span>{tx('Força', 'Strength')}</span>
       </div>
       <div>
         <b>12:15</b>
@@ -261,96 +256,108 @@ const Fitness = () => (
       </div>
       <div>
         <b>18:30</b>
-        <span>Mobilidade</span>
+        <span>{tx('Mobilidade', 'Mobility')}</span>
       </div>
-      <span className="wfi-cta">Aula experimental</span>
+      <span className="wfi-cta">{tx('Aula experimental', 'Trial class')}</span>
     </div>
   </div>
 )
 
-const Auto = () => (
+const Auto = ({ tx }: { tx: Tx }) => (
   <div className="world w-auto">
     <header className="w-nav">
       <b className="wau-logo">VÉRTICE</b>
       <nav>
-        <span>Modelos</span>
-        <span>Configurar</span>
-        <span>Concessionárias</span>
+        <span>{tx('Modelos', 'Models')}</span>
+        <span>{tx('Configurar', 'Configure')}</span>
+        <span>{tx('Concessionárias', 'Dealers')}</span>
       </nav>
       <span className="wau-s">Test drive</span>
     </header>
     <div className="wau-title r1">
-      Performance em
+      {tx('Performance em', 'Performance in')}
       <br />
-      cada detalhe.
+      {tx('cada detalhe.', 'every detail.')}
     </div>
     <div className="wau-car">
       <Img n="auto-1" sizes="(max-width: 899px) 100vw, 1300px" />
     </div>
     <div className="wau-specs r2">
       <div>
-        <b>3,2 s</b>
+        <b>{tx('3,2 s', '3.2 s')}</b>
         <span>0–100 km/h</span>
       </div>
       <div>
-        <b>650 cv</b>
-        <span>Potência</span>
+        <b>{tx('650 cv', '650 hp')}</b>
+        <span>{tx('Potência', 'Power')}</span>
       </div>
       <div>
         <b>318 km/h</b>
-        <span>Velocidade máx.</span>
+        <span>{tx('Velocidade máx.', 'Top speed')}</span>
       </div>
     </div>
     <div className="wau-foot r3">
-      <span className="wau-model">Série V — GT</span>
-      <span className="wau-cta">Agendar test drive</span>
+      <span className="wau-model">{tx('Série V — GT', 'V Series — GT')}</span>
+      <span className="wau-cta">{tx('Agendar test drive', 'Book a test drive')}</span>
     </div>
   </div>
 )
 
-const Fashion = () => (
+const Fashion = ({ tx }: { tx: Tx }) => (
   <div className="world w-fashion">
     <header className="w-nav">
       <b className="wfa-logo">SOMBRA</b>
       <nav>
-        <span>Novidades</span>
-        <span>Coleções</span>
+        <span>{tx('Novidades', 'New in')}</span>
+        <span>{tx('Coleções', 'Collections')}</span>
         <span>Lookbook</span>
       </nav>
-      <span>Sacola (2)</span>
+      <span>{tx('Sacola (2)', 'Bag (2)')}</span>
     </header>
     <div className="wfa-main">
       <Img n="fashion-1" sizes="(max-width: 899px) 50vw, 640px" />
     </div>
     <div className="wfa-title r1">
-      Estilo que
+      {tx('Estilo que', 'Style that')}
       <br />
-      transcende.
+      {tx('transcende.', 'transcends.')}
     </div>
     <div className="wfa-side r2">
       <Img n="fashion-2" sizes="380px" />
       <div className="wfa-prod">
-        <span>Jaqueta Shell Oversized</span>
+        <span>{tx('Jaqueta Shell Oversized', 'Oversized shell jacket')}</span>
         <b>R$ 689</b>
       </div>
     </div>
     <div className="wfa-coll r3">
-      <small>Coleção</small>
-      <span>Inverno 26</span>
-      <span className="wfa-cta">Ver coleção</span>
+      <small>{tx('Coleção', 'Collection')}</small>
+      <span>{tx('Inverno 26', 'Winter 26')}</span>
+      <span className="wfa-cta">{tx('Ver coleção', 'View collection')}</span>
     </div>
-    <div className="wfa-issue">N.º 08</div>
+    <div className="wfa-issue">{tx('N.º 08', 'No. 08')}</div>
   </div>
 )
 
 export const WORLDS = [Arch, Estate, Barber, Food, Clinic, Fitness, Auto, Fashion]
-export const WORLD_HEADLINES = [
-  'Construindo um futuro melhor.',
-  'Viva o extraordinário.',
-  'Mais que um corte. Um estilo de vida.',
-  'Uma experiência além do paladar.',
-  'Realce o que há de melhor em você.',
-  'Supere seus limites.',
-  'Performance em cada detalhe.',
-  'Estilo que transcende.',
-]
+export const WORLD_HEADLINES = {
+  pt: [
+    'Construindo um futuro melhor.',
+    'Viva o extraordinário.',
+    'Mais que um corte. Um estilo de vida.',
+    'Uma experiência além do paladar.',
+    'Realce o que há de melhor em você.',
+    'Supere seus limites.',
+    'Performance em cada detalhe.',
+    'Estilo que transcende.',
+  ],
+  en: [
+    'Building a better future.',
+    'Live the extraordinary.',
+    'More than a haircut. A way of life.',
+    'An experience beyond taste.',
+    'Bring out the best in you.',
+    'Push your limits.',
+    'Performance in every detail.',
+    'Style that transcends.',
+  ],
+}

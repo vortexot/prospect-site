@@ -1,4 +1,4 @@
-import '@fontsource-variable/archivo/standard.css'
+import './styles/fonts.css'
 import './styles/notfound.css'
 import { MARK_BODY, MARK_TIP, toPath } from './brand/logoPaths'
 
